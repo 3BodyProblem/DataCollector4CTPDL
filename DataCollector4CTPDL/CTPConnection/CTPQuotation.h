@@ -21,20 +21,6 @@ class CTPWorkStatus
 {
 public:
 	/**
-	 * @class	E_SS_Status
-	 * @brief	CTP行情会话状态枚举
-	 */
-    enum E_SS_Status
-	{
-		ET_SS_UNACTIVE = 0,				///< 未激活:	需要对Session调用Initialize()
-		ET_SS_DISCONNECTED,				///< 断开状态
-		ET_SS_CONNECTED,				///< 连通状态
-		ET_SS_LOGIN,					///< 登录成功
-        ET_SS_INITIALIZING,				///< 初始化码表/快照中
-		ET_SS_WORKING,					///< 正常工作中
-    };
-
-	/**
 	 * @brief				应状态值映射成状态字符串
 	 */
 	static	std::string&	CastStatusStr( enum E_SS_Status eStatus );

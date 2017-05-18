@@ -70,7 +70,7 @@ public:
 	/**
 	 * @brief					取得采集模块的当前状态
 	 */
-	enum E_QS_STATUS			GetCollectorStatus();
+	enum E_SS_Status			GetCollectorStatus();
 
 	/**
 	 * @brief					取得能订阅的商品

@@ -14,7 +14,7 @@ CTPWorkStatus::CTPWorkStatus( const CTPWorkStatus& refStatus )
 	m_eWorkStatus = refStatus.m_eWorkStatus;
 }
 
-CTPWorkStatus::operator enum CTPWorkStatus::E_SS_Status()
+CTPWorkStatus::operator enum E_SS_Status()
 {
 	return m_eWorkStatus;
 }
@@ -82,7 +82,7 @@ CTPWorkStatus& CTPQuotation::GetWorkStatus()
 
 int CTPQuotation::Activate()
 {
-	if( GetWorkStatus() == CTPWorkStatus::ET_SS_UNACTIVE )
+	if( GetWorkStatus() == ET_SS_UNACTIVE )
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::Activate() : ............ CTP Session Activating............" );
 		CTPLinkConfig&		refConfig = Configuration::GetConfig().GetHQConfList();
@@ -103,7 +103,7 @@ int CTPQuotation::Activate()
 		}
 
 		m_pCTPApi->Init();												///< 使客户端开始与行情发布服务器建立连接
-		m_oWorkStatus = CTPWorkStatus::ET_SS_DISCONNECTED;				///< 更新CTPQuotation会话的状态
+		m_oWorkStatus = ET_SS_DISCONNECTED;				///< 更新CTPQuotation会话的状态
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::Activate() : ............ CTPQuotation Activated!.............." );
 	}
 
@@ -120,7 +120,7 @@ int CTPQuotation::Destroy()
 		m_pCTPApi->Release();
 		m_pCTPApi = NULL;
 
-		m_oWorkStatus = CTPWorkStatus::ET_SS_UNACTIVE;	///< 更新CTPQuotation会话的状态
+		m_oWorkStatus = ET_SS_UNACTIVE;	///< 更新CTPQuotation会话的状态
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::Destroy() : ............ Destroyed! .............." );
 	}
 
@@ -129,7 +129,7 @@ int CTPQuotation::Destroy()
 
 int CTPQuotation::SubscribeQuotation()
 {
-	if( GetWorkStatus() == CTPWorkStatus::ET_SS_LOGIN )			///< 登录成功后，执行订阅操作
+	if( GetWorkStatus() == ET_SS_LOGIN )			///< 登录成功后，执行订阅操作
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::SubscribeQuotation() : [ATTENTION] - Quotation Is Subscribing................" );
 
@@ -164,7 +164,7 @@ int CTPQuotation::SubscribeQuotation()
 			QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::SubscribeQuotation() : dump file created, result = %d", bRet );
 		}
 
-		m_oWorkStatus = CTPWorkStatus::ET_SS_INITIALIZING;		///< 更新CTPQuotation会话的状态
+		m_oWorkStatus = ET_SS_INITIALIZING;		///< 更新CTPQuotation会话的状态
 		if( nRet > 0 ) { nRet = m_pCTPApi->SubscribeMarketData( pszCodes, nRet ); }
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::SubscribeQuotation() : [ATTENTION] - Quotation Has Been Subscribed! errorcode(%d) !!!", nRet );
 		return 0;
@@ -199,7 +199,7 @@ void CTPQuotation::OnFrontConnected()
 {
 	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::OnFrontConnected() : connection established." );
 
-	m_oWorkStatus = CTPWorkStatus::ET_SS_CONNECTED;				///< 更新CTPQuotation会话的状态
+	m_oWorkStatus = ET_SS_CONNECTED;				///< 更新CTPQuotation会话的状态
 
     SendLoginRequest();
 }
@@ -215,7 +215,7 @@ void CTPQuotation::OnFrontDisconnected( int nReason )
 
 	QuoCollector::GetCollector()->OnLog( TLV_WARN, "CTPQuotation::OnFrontDisconnected() : connection disconnected, [reason:%d] [info:%s]", nReason, pszInfo );
 
-	m_oWorkStatus = CTPWorkStatus::ET_SS_DISCONNECTED;			///< 更新CTPQuotation会话的状态
+	m_oWorkStatus = ET_SS_DISCONNECTED;			///< 更新CTPQuotation会话的状态
 }
 
 void CTPQuotation::OnHeartBeatWarning( int nTimeLapse )
@@ -235,14 +235,14 @@ void CTPQuotation::OnRspUserLogin( CThostFtdcRspUserLoginField *pRspUserLogin, C
 		QuoCollector::GetCollector()->OnLog( TLV_WARN, "CTPQuotation::OnRspUserLogin() : failed 2 login [Err=%d,ErrMsg=%s,RequestID=%d,Chain=%d]"
 											, pRspInfo->ErrorID, pRspInfo->ErrorMsg, nRequestID, bIsLast );
 
-		m_oWorkStatus = CTPWorkStatus::ET_SS_CONNECTED;			///< 更新CTPQuotation会话的状态
+		m_oWorkStatus = ET_SS_CONNECTED;			///< 更新CTPQuotation会话的状态
         Sleep( 3000 );
         SendLoginRequest();
     }
 	else
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::OnRspUserLogin() : succeed 2 login [RequestID=%d,Chain=%d]", nRequestID, bIsLast );
-		m_oWorkStatus = CTPWorkStatus::ET_SS_LOGIN;				///< 更新CTPQuotation会话的状态
+		m_oWorkStatus = ET_SS_LOGIN;				///< 更新CTPQuotation会话的状态
 		SubscribeQuotation();
 	}
 }
@@ -265,7 +265,7 @@ void CTPQuotation::OnRtnDepthMarketData( CThostFtdcDepthMarketDataField *pMarket
 	QuotationSync::CTPSyncSaver::GetHandle().SaveSnapData( *pMarketData );
 
 	///< 判断是否收完全幅快照(以收到的代码是否有重复为判断依据)
-	bool	bInitializing = (enum CTPWorkStatus::E_SS_Status)m_oWorkStatus != CTPWorkStatus::ET_SS_WORKING;
+	bool	bInitializing = (enum E_SS_Status)m_oWorkStatus != ET_SS_WORKING;
 	if( true == bInitializing )
 	{
 		CriticalLock	section( m_oLock );
@@ -276,7 +276,7 @@ void CTPQuotation::OnRtnDepthMarketData( CThostFtdcDepthMarketDataField *pMarket
 		}
 		else
 		{
-			m_oWorkStatus = CTPWorkStatus::ET_SS_WORKING;	///< 收到重复代码，全幅快照已收完整
+			m_oWorkStatus = ET_SS_WORKING;	///< 收到重复代码，全幅快照已收完整
 			bInitializing = true;
 		}
 	}

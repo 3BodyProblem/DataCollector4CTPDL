@@ -133,12 +133,12 @@ int QuoCollector::RecoverQuotation()
 		return -2;
 	}
 
-	for( nSec = 0; nSec < 60 && CTPWorkStatus::ET_SS_WORKING == m_oQuotationData.GetWorkStatus(); nSec++ )
+	for( nSec = 0; nSec < 60 && ET_SS_WORKING == m_oQuotationData.GetWorkStatus(); nSec++ )
 	{
 		SimpleTask::Sleep( 1000 * 1 );
 	}
 
-	if( CTPWorkStatus::ET_SS_WORKING == m_oQuotationData.GetWorkStatus() )
+	if( ET_SS_WORKING == m_oQuotationData.GetWorkStatus() )
 	{
 		return 0;
 	}
@@ -149,9 +149,9 @@ int QuoCollector::RecoverQuotation()
 	}
 }
 
-enum E_QS_STATUS QuoCollector::GetCollectorStatus()
+enum E_SS_Status QuoCollector::GetCollectorStatus()
 {
-	return E_STATUS_NONE;
+	return (enum E_SS_Status)(m_oQuotationData.GetWorkStatus());
 }
 
 
