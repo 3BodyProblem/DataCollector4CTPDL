@@ -75,12 +75,6 @@ typedef	std::set<std::string>		T_SET_INSTRUMENTID;			///< 商品代码集合
 class CTPQuotation : public CThostFtdcMdSpi
 {
 public:
-	/**
-	 * @brief			构造
-	 * @param[in]		oConfig			CTP链路配置信息
-	 * @param[in]		pQuotationData	行情数据对象地址
-	 */
-	CTPQuotation( const CTPLinkConfig& oConfig );
 	CTPQuotation();
 	~CTPQuotation();
 
@@ -137,51 +131,12 @@ public:///< CThostFtdcMdSpi的回调接口
 	void OnRspError( CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast );
 
 private:
-	CTPLinkConfig		m_oSvrConfig;			///< CTP链路配置信息
 	CThostFtdcMdApi*	m_pCTPApi;				///< 第三方提供的cffex接口
 	CTPWorkStatus		m_oWorkStatus;			///< 工作状态
 	T_SET_INSTRUMENTID	m_setRecvCode;			///< 收到的代码集合
 	CriticalObject		m_oLock;				///< 临界区对象
 };
 
-
-/**
- * @class			CTPSessionCollection
- * @brief			CTP行情会话集合
- */
-class CTPSessionCollection : public std::vector<CTPQuotation>
-{
-public:
-	/**
-	 * @class	E_INIT_STATUS
-	 * @brief	行情快照初始化状态
-	 */
-    enum E_INIT_STATUS
-	{
-		ET_INIT_NOT_READY = 0,			///< 未激活
-		ET_INIT_RECEIVING,				///< 快照接收初始中
-		ET_INIT_ALL_RECEIVED,			///< 全部接收完成
-		ET_INIT_RECV_OVERTIME,			///< 接收超时
-    };
-public:
-	/**
-	 * @brief		构造
-	 * @param		nPrepareSessionNum	需要构造的CTPQuotation数量
-	 */
-	CTPSessionCollection( unsigned int nPrepareSessionNum = 3 );
-
-	/**
-	 * @breif		释放所有CTP会话
-	 */
-	void			DestroyAllSession();
-
-	/**
-	 * @brief		检查是否全部的全幅快照收僵
-	 * @param[in]	nTargetNumber	目标接收数量
-	 * @param[out]	nActualNum		实际收到的数量
-	 */
-	enum E_INIT_STATUS	CheckInitialStatus( unsigned int nTargetNumber, unsigned int& nActualNum );
-};
 
 
 

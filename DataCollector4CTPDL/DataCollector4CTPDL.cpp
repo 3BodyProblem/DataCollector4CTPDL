@@ -118,8 +118,35 @@ int QuoCollector::Execute()
 
 int QuoCollector::RecoverQuotation()
 {
+	unsigned int	nSec = 0;
+	int				nErrorCode = 0;
 
-	return 0;
+	if( (nErrorCode=m_oImageData.FreshCache()) <= 0 )
+	{
+		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : failed 2 refresh image data, errorcode=%d", nErrorCode );
+		return -1;
+	}
+
+	if( 0 != (nErrorCode=m_oQuotationData.Activate()) )
+	{
+		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : failed 2 subscript quotation, errorcode=%d", nErrorCode );
+		return -2;
+	}
+
+	for( nSec = 0; nSec < 60 && CTPWorkStatus::ET_SS_WORKING == m_oQuotationData.GetWorkStatus(); nSec++ )
+	{
+		SimpleTask::Sleep( 1000 * 1 );
+	}
+
+	if( CTPWorkStatus::ET_SS_WORKING == m_oQuotationData.GetWorkStatus() )
+	{
+		return 0;
+	}
+	else
+	{
+		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : overtime [> %d sec.], errorcode=%d", nSec, nErrorCode );
+		return -3;
+	}
 }
 
 enum E_QS_STATUS QuoCollector::GetCollectorStatus()

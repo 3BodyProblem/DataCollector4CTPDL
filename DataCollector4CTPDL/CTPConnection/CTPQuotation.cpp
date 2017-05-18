@@ -65,12 +65,6 @@ CTPWorkStatus&	CTPWorkStatus::operator= ( enum E_SS_Status eWorkStatus )
 ///< ----------------------------------------------------------------
 
 
-CTPQuotation::CTPQuotation( const CTPLinkConfig& oConfig )
- : m_pCTPApi( NULL ), m_oSvrConfig( oConfig )
-{
-	Destroy();
-}
-
 CTPQuotation::CTPQuotation()
  : m_pCTPApi( NULL )
 {
@@ -91,6 +85,7 @@ int CTPQuotation::Activate()
 	if( GetWorkStatus() == CTPWorkStatus::ET_SS_UNACTIVE )
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuotation::Activate() : ............ CTP Session Activating............" );
+		CTPLinkConfig&		refConfig = Configuration::GetConfig().GetHQConfList();
 
 		Destroy();
 		m_pCTPApi = CThostFtdcMdApi::CreateFtdcMdApi();					///< 从CTP的DLL导出新的api接口
@@ -101,7 +96,7 @@ int CTPQuotation::Activate()
 		}
 
 		m_pCTPApi->RegisterSpi( this );									///< 将this注册为事件处理的实例
-		if( false == m_oSvrConfig.RegisterServer( m_pCTPApi, NULL ) )	///< 注册CTP链接需要的网络配置
+		if( false == refConfig.RegisterServer( m_pCTPApi, NULL ) )		///< 注册CTP链接需要的网络配置
 		{
 			QuoCollector::GetCollector()->OnLog( TLV_WARN, "CTPQuotation::Activate() : invalid front/name server address" );
 			return -4;
@@ -186,9 +181,9 @@ void CTPQuotation::SendLoginRequest()
 
 	strcpy( reqUserLogin.UserProductInfo,"上海乾隆高科技有限公司" );
 	strcpy( reqUserLogin.TradingDay, m_pCTPApi->GetTradingDay() );
-	memcpy( reqUserLogin.Password, m_oSvrConfig.m_sPswd.c_str(), m_oSvrConfig.m_sPswd.length() );
-	memcpy( reqUserLogin.UserID, m_oSvrConfig.m_sUID.c_str(), m_oSvrConfig.m_sUID.length() );
-	memcpy( reqUserLogin.BrokerID, m_oSvrConfig.m_sParticipant.c_str(), m_oSvrConfig.m_sParticipant.length() );
+	memcpy( reqUserLogin.Password, Configuration::GetConfig().GetHQConfList().m_sPswd.c_str(), Configuration::GetConfig().GetHQConfList().m_sPswd.length() );
+	memcpy( reqUserLogin.UserID, Configuration::GetConfig().GetHQConfList().m_sUID.c_str(), Configuration::GetConfig().GetHQConfList().m_sUID.length() );
+	memcpy( reqUserLogin.BrokerID, Configuration::GetConfig().GetHQConfList().m_sParticipant.c_str(), Configuration::GetConfig().GetHQConfList().m_sParticipant.length() );
 
 	if( 0 == m_pCTPApi->ReqUserLogin( &reqUserLogin, 0 ) )
 	{
@@ -308,7 +303,7 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 //	tagSnapTable = m_oSnapTable[nSerial];
 	assert( strncmp( refNameTable.Code, tagSnapTable.Code, sizeof(tagSnapTable.Code) )==0 );
 
-	if( true == bInitialize ) {	///< 初始化行情
+/*	if( true == bInitialize ) {	///< 初始化行情
 		refNameTable.LeavesQty = pQuotationData->PreOpenInterest*dRate+0.5;
 	}
 	if( pQuotationData->UpperLimitPrice > 0 ) {
@@ -316,7 +311,7 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 	}
 	if( pQuotationData->LowerLimitPrice > 0 ) {
 		refNameTable.DownLimit = pQuotationData->LowerLimitPrice*dRate+0.5;
-	}
+	}*/
 
 	tagSnapTable.UpperPrice = pQuotationData->UpperLimitPrice*dRate+0.5;
 	tagSnapTable.LowerPrice = pQuotationData->LowerLimitPrice*dRate+0.5;
@@ -389,64 +384,6 @@ void CTPQuotation::OnRspError( CThostFtdcRspInfoField *pRspInfo, int nRequestID,
 	QuoCollector::GetCollector()->OnLog( TLV_ERROR, "CTPQuotation::OnRspError() : [%s] ErrorCode=[%d], ErrorMsg=[%s],RequestID=[%d], Chain=[%d]"
 										, pRspInfo->ErrorID, pRspInfo->ErrorMsg, nRequestID, bIsLast );
 }
-
-CTPSessionCollection::CTPSessionCollection( unsigned int nPrepareSessionNum )
-{
-	if( nPrepareSessionNum > 0 )
-	{
-		resize( nPrepareSessionNum );
-	}
-}
-
-void CTPSessionCollection::DestroyAllSession()
-{
-	///< 遍历+释放session obj.
-	std::for_each( begin(), end(), std::mem_fun_ref(&CTPQuotation::Destroy) );
-}
-
-enum CTPSessionCollection::E_INIT_STATUS CTPSessionCollection::CheckInitialStatus( unsigned int nTargetNumber, unsigned int& nActualNum )
-{
-	static	unsigned int	nLoopCheckCount = 0;	///< 检查次数（隔一秒一次）
-	unsigned int			nInitiatedSessionNum=0;	///< 已进入初始化状态的会话数量
-
-	nActualNum = 0;
-	nLoopCheckCount++;
-	for( std::vector<CTPQuotation>::iterator it = begin(); it != end(); it++ )
-	{
-		nActualNum += it->GetInitialCodeNum();
-		if( it->GetWorkStatus() >= CTPWorkStatus::ET_SS_INITIALIZING ) {
-			nInitiatedSessionNum++;
-		}
-	}
-
-	if( nInitiatedSessionNum < 3 )					///< 有ctp会话还未进入全幅快照接收初始化阶段
-	{
-		nLoopCheckCount = 0;						///< 循环计数器置零
-		return ET_INIT_NOT_READY;
-	}
-
-	if( nActualNum >= nTargetNumber && nTargetNumber > 0 )///< 总数==订阅商品总数,初始化成功
-	{
-		nLoopCheckCount = 0;						///< 循环计数器置零
-		return ET_INIT_ALL_RECEIVED;
-	}
-
-	if( nLoopCheckCount > 60*1 /* 60秒 * N */ )		///< 2分钟初始化全幅快照接收的超时
-	{
-		nLoopCheckCount = 0;						///< 循环计数器置零
-		return ET_INIT_RECV_OVERTIME;				///< 初始化超时
-	}
-
-	return ET_INIT_RECEIVING;						///< 第一波全幅快照还在接收中
-}
-
-
-
-
-
-
-
-
 
 
 

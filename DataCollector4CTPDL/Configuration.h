@@ -47,7 +47,7 @@ public:
  */
 class Configuration
 {
-private:
+protected:
 	Configuration();
 
 public:

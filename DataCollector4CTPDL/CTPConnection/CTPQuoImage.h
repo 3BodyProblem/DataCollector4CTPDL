@@ -38,8 +38,7 @@ public:
 
 	/**
 	 * @brief				更新基础数据
-	 * @return				>=0			成功
-							<0			失败
+	 * @return				返回取到的商品码表数量
 	 */
 	int						FreshCache();
 

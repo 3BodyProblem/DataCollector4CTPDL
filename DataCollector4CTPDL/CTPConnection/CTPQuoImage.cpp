@@ -75,9 +75,10 @@ int CTPQuoImage::FreshCache()
 
 	FreeApi();														///< ÊÍ·Åapi£¬½áÊøÇëÇó
 	CriticalLock	section( m_oLock );
-	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............. [OK][%s] basic data freshed(%d) ...........", m_mapBasicData.size() );
+	unsigned int	nSize = m_mapBasicData.size();
+	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............. [OK][%s] basic data freshed(%d) ...........", nSize );
 
-	return 0;
+	return nSize;
 }
 
 int CTPQuoImage::FreeApi()
