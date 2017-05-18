@@ -11,11 +11,15 @@ CTPWorkStatus::CTPWorkStatus()
 
 CTPWorkStatus::CTPWorkStatus( const CTPWorkStatus& refStatus )
 {
+	CriticalLock	section( m_oLock );
+
 	m_eWorkStatus = refStatus.m_eWorkStatus;
 }
 
 CTPWorkStatus::operator enum E_SS_Status()
 {
+	CriticalLock	section( m_oLock );
+
 	return m_eWorkStatus;
 }
 
@@ -50,6 +54,8 @@ std::string& CTPWorkStatus::CastStatusStr( enum E_SS_Status eStatus )
 
 CTPWorkStatus&	CTPWorkStatus::operator= ( enum E_SS_Status eWorkStatus )
 {
+	CriticalLock	section( m_oLock );
+
 	if( m_eWorkStatus != eWorkStatus )
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPWorkStatus::operator=() : Exchange CTP Session Status [%s]->[%s]"

@@ -45,6 +45,7 @@ public:
 	operator			enum E_SS_Status();
 
 private:
+	CriticalObject		m_oLock;				///< 临界区对象
 	enum E_SS_Status	m_eWorkStatus;			///< 行情工作状态
 };
 

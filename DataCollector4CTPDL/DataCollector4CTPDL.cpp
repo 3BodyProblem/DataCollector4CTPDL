@@ -46,6 +46,8 @@ int QuoCollector::Initialize( I_DataHandle* pIDataHandle )
 
 void QuoCollector::Release()
 {
+	SimpleTask::StopThread();
+	SimpleTask::Join( 1000*3 );
 	m_pCbDataHandle = NULL;
 }
 
