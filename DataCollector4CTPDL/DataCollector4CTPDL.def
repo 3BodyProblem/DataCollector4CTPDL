@@ -1,0 +1,9 @@
+EXPORTS
+	Initialize
+	Release
+	RecoverQuotation
+	GetStatus
+	ExecuteUnitTest
+
+
+
