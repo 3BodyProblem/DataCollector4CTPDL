@@ -135,7 +135,7 @@ int QuoCollector::RecoverQuotation()
 		return -2;
 	}
 
-	for( nSec = 0; nSec < 60 && ET_SS_WORKING == m_oQuotationData.GetWorkStatus(); nSec++ )
+	for( nSec = 0; nSec < 60 && ET_SS_WORKING != m_oQuotationData.GetWorkStatus(); nSec++ )
 	{
 		SimpleTask::Sleep( 1000 * 1 );
 	}
@@ -146,6 +146,7 @@ int QuoCollector::RecoverQuotation()
 	}
 	else
 	{
+		m_oQuotationData.Destroy();
 		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : overtime [> %d sec.], errorcode=%d", nSec, nErrorCode );
 		return -3;
 	}
@@ -159,27 +160,27 @@ enum E_SS_Status QuoCollector::GetCollectorStatus()
 
 extern "C"
 {
-	__declspec(dllexport) int	Initialize( I_DataHandle* pIDataHandle )
+	__declspec(dllexport) int __stdcall	Initialize( I_DataHandle* pIDataHandle )
 	{
 		return QuoCollector::GetCollector().Initialize( pIDataHandle );
 	}
 
-	__declspec(dllexport) void	Release()
+	__declspec(dllexport) void __stdcall	Release()
 	{
 		QuoCollector::GetCollector().Release();
 	}
 
-	__declspec(dllexport) int	RecoverQuotation()
+	__declspec(dllexport) int __stdcall	RecoverQuotation()
 	{
 		return QuoCollector::GetCollector().RecoverQuotation();
 	}
 
-	__declspec(dllexport) int	GetStatus()
+	__declspec(dllexport) int __stdcall	GetStatus()
 	{
 		return QuoCollector::GetCollector().GetCollectorStatus();
 	}
 
-	__declspec(dllexport) void	ExecuteUnitTest()
+	__declspec(dllexport) void __stdcall	ExecuteUnitTest()
 	{
 		::printf( "\n\n---------------------- [Begin] -------------------------\n" );
 		ExecuteTestCase();

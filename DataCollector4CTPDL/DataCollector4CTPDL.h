@@ -106,29 +106,29 @@ protected:
 extern "C"
 {
 	/**
-	 * @brief					初始化数据采集模块
+	 * @brief								初始化数据采集模块
 	 */
-	__declspec(dllexport) int	Initialize( I_DataHandle* pIDataHandle );
+	__declspec(dllexport) int __stdcall		Initialize( I_DataHandle* pIDataHandle );
 
 	/**
-	 * @brief					释放数据采集模块
+	 * @brief								释放数据采集模块
 	 */
-	__declspec(dllexport) void	Release();
+	__declspec(dllexport) void __stdcall	Release();
 
 	/**
-	 * @brief					重新初始化并加载行情数据
+	 * @brief								重新初始化并加载行情数据
 	 */
-	__declspec(dllexport) int	RecoverQuotation();
+	__declspec(dllexport) int __stdcall		RecoverQuotation();
 
 	/**
-	 * @brief					获取模块的当前状态
+	 * @brief								获取模块的当前状态
 	 */
-	__declspec(dllexport) int	GetStatus();
+	__declspec(dllexport) int __stdcall		GetStatus();
 
 	/**
-	 * @brief					单元测试导出函数
+	 * @brief								单元测试导出函数
 	 */
-	__declspec(dllexport) void	ExecuteUnitTest();
+	__declspec(dllexport) void __stdcall	ExecuteUnitTest();
 }
 
 

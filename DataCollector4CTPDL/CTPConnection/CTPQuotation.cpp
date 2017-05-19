@@ -253,13 +253,6 @@ void CTPQuotation::OnRspUserLogin( CThostFtdcRspUserLoginField *pRspUserLogin, C
 	}
 }
 
-unsigned int CTPQuotation::GetInitialCodeNum()
-{
-	CriticalLock	section( m_oLock );
-
-	return m_setRecvCode.size();
-}
-
 void CTPQuotation::OnRtnDepthMarketData( CThostFtdcDepthMarketDataField *pMarketData )
 {
 	if( NULL == pMarketData )
@@ -307,7 +300,7 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 //	tagCTPSnapData&					refNameTable = m_oRefTable[nSerial];	///< 码表结构
 //	dRate = QuotationData::GetMkInfo().GetRateByCategory( refNameTable.Type );
 //	tagSnapTable = m_oSnapTable[nSerial];
-	assert( strncmp( refNameTable.Code, tagSnapTable.Code, sizeof(tagSnapTable.Code) )==0 );
+	//assert( strncmp( refNameTable.Code, tagSnapTable.Code, sizeof(tagSnapTable.Code) )==0 );
 
 /*	if( true == bInitialize ) {	///< 初始化行情
 		refNameTable.LeavesQty = pQuotationData->PreOpenInterest*dRate+0.5;
@@ -331,7 +324,7 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 	tagSnapTable.SettlePrice = pQuotationData->SettlementPrice*dRate+0.5;
 //	if( EV_MK_ZZ == eMkID )		///< 郑州市场的成交金额特殊处理： = 金额 * 合约单位
 	{
-		tagSnapTable.Amount = pQuotationData->Turnover * refNameTable.ContractMult;
+//		tagSnapTable.Amount = pQuotationData->Turnover * refNameTable.ContractMult;
 	}
 //	else
 	{

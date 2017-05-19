@@ -62,8 +62,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="gtestd.lib"
+				OutputFile="D:\ServiceManager\srvunit\DataNode\$(ProjectName).dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../libs/gtest/library_vc9/Debug/"
+				ModuleDefinitionFile="DataCollector4CTPDL.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -139,6 +141,7 @@
 				AdditionalDependencies="gtest.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../libs/gtest/library_vc9/Release/"
+				ModuleDefinitionFile="DataCollector4CTPDL.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

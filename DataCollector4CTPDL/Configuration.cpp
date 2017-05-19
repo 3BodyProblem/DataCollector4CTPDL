@@ -94,27 +94,32 @@ int ParseSvrConfig( inifile::IniFile& refIniFile, std::string sNodeName, CTPLink
 	oCTPConfig.m_sParticipant = refIniFile.getStringValue( sNodeName, std::string("Participant"), nErrCode );
 	if( 0 != nErrCode )	{
 		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "Configuration::ParseSvrConfig() : invalid participant." );
+		return -1;
 	}
 
 	oCTPConfig.m_sUID = refIniFile.getStringValue( sNodeName, std::string("LoginUser"), nErrCode );
 	if( 0 != nErrCode )	{
 		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "Configuration::ParseSvrConfig() : invalid login UserName." );
+		return -2;
 	}
 
 	oCTPConfig.m_sPswd = refIniFile.getStringValue( sNodeName, std::string("LoginPWD"), nErrCode );
 	if( 0 != nErrCode )	{
 		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "Configuration::ParseSvrConfig() : invalid login LoginPWD." );
+		return -3;
 	}
 
 	std::string		sFrontServer = refIniFile.getStringValue( sNodeName, std::string("FrontServer"), nErrCode );
 	if( 0 != nErrCode )	{
 		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "Configuration::ParseSvrConfig() : invalid FrontServer." );
+		return -3;
 	}
 	oCTPConfig.m_vctFrontServer = StrSplit( sFrontServer );
 
 	std::string		sNameServer = refIniFile.getStringValue( sNodeName, std::string("NameServer"), nErrCode );
 	if( 0 != nErrCode )	{
 		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "Configuration::ParseSvrConfig() : invalid NameServer." );
+		return -4;
 	}
 	oCTPConfig.m_vctNameServer  = StrSplit( sNameServer );
 
@@ -155,8 +160,15 @@ int Configuration::Initialize()
 		QuoCollector::GetCollector()->OnLog( TLV_WARN, "Configuration::Initialize() : shutdown dump function." );
 	}
 
-	ParseSvrConfig( oIniFile, "HQSRV", m_oHQConfigList );
-	ParseSvrConfig( oIniFile, "TRDSRV", m_oTrdConfigList );
+	if( 0 != ParseSvrConfig( oIniFile, "HQSRV", m_oHQConfigList ) )
+	{
+		return -2;
+	}
+
+	if( 0 != ParseSvrConfig( oIniFile, "TRDSRV", m_oTrdConfigList ) )
+	{
+		return -3;
+	}
 
 	return 0;
 }

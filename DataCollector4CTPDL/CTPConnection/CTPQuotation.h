@@ -95,13 +95,6 @@ public:///< 公共方法函数
 	 */
     void				SendLoginRequest();
 
-	/**
-	 * @brief			取得收到全幅快照的商品数量(即初始化成功的)
-	 * @return			初始化成功的商品数量
-	 * @note			如果未收全，则返回0
-	 */
-	unsigned int		GetInitialCodeNum();
-
 	/** 
 	 * @brief			刷数据到发送缓存
 	 * @param[in]		pQuotationData			行情数据结构

@@ -3,15 +3,6 @@
 #pragma comment(lib, "./CTPConnection/thosttraderapi.lib")
 
 
-CTPQuoImage::CTPQuoImage( const CTPLinkConfig& oConfig )
- : m_pTraderApi( NULL ), m_oSvrConfig( oConfig ), m_nTrdReqID( 0 )
- , m_bIsResponded( false )
-{
-	CriticalLock	section( m_oLock );
-
-	m_mapBasicData.clear();
-}
-
 CTPQuoImage::CTPQuoImage()
  : m_pTraderApi( NULL ), m_nTrdReqID( 0 ), m_bIsResponded( false )
 {
@@ -38,7 +29,7 @@ int CTPQuoImage::GetSubscribeCodeList( char (&pszCodeList)[1024*5][20], unsigned
 
 int CTPQuoImage::FreshCache()
 {
-	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............ [%s] freshing basic data ..............." );
+	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............ freshing basic data ..............." );
 
 	FreeApi();///< 清理上下文 && 创建api控制对象
 	if( NULL == (m_pTraderApi=CThostFtdcTraderApi::CreateFtdcTraderApi()) )
@@ -57,7 +48,7 @@ int CTPQuoImage::FreshCache()
 	QuotationSync::CTPSyncSaver::GetHandle().Init( sDumpFile.c_str(), DateTime::Now().DateToLong(), true );
 
 	m_pTraderApi->RegisterSpi( this );								///< 将this注册为事件处理的实例
-	if( false == m_oSvrConfig.RegisterServer( NULL, m_pTraderApi ) )///< 注册CTP链接需要的网络配置
+	if( false == Configuration::GetConfig().GetTrdConfList().RegisterServer( NULL, m_pTraderApi ) )///< 注册CTP链接需要的网络配置
 	{
 		QuoCollector::GetCollector()->OnLog( TLV_WARN, "CTPQuoImage::FreshCache() : invalid front/name server address" );
 		return -2;
@@ -76,7 +67,7 @@ int CTPQuoImage::FreshCache()
 	FreeApi();														///< 释放api，结束请求
 	CriticalLock	section( m_oLock );
 	unsigned int	nSize = m_mapBasicData.size();
-	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............. [OK][%s] basic data freshed(%d) ...........", nSize );
+	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............. [OK] basic data freshed(%d) ...........", nSize );
 
 	return nSize;
 }
@@ -116,9 +107,9 @@ void CTPQuoImage::SendLoginRequest()
 
 	CThostFtdcReqUserLoginField	reqUserLogin = { 0 };
 
-	memcpy( reqUserLogin.BrokerID, m_oSvrConfig.m_sParticipant.c_str(), m_oSvrConfig.m_sParticipant.length() );
-	memcpy( reqUserLogin.UserID, m_oSvrConfig.m_sUID.c_str(), m_oSvrConfig.m_sUID.length() );
-	memcpy( reqUserLogin.Password, m_oSvrConfig.m_sPswd.c_str(), m_oSvrConfig.m_sPswd.length() );
+	memcpy( reqUserLogin.BrokerID, Configuration::GetConfig().GetTrdConfList().m_sParticipant.c_str(), Configuration::GetConfig().GetTrdConfList().m_sParticipant.length() );
+	memcpy( reqUserLogin.UserID, Configuration::GetConfig().GetTrdConfList().m_sUID.c_str(), Configuration::GetConfig().GetTrdConfList().m_sUID.length() );
+	memcpy( reqUserLogin.Password, Configuration::GetConfig().GetTrdConfList().m_sPswd.c_str(), Configuration::GetConfig().GetTrdConfList().m_sPswd.length() );
 	strcpy( reqUserLogin.UserProductInfo,"上海乾隆高科技有限公司" );
 	strcpy( reqUserLogin.TradingDay, m_pTraderApi->GetTradingDay() );
 

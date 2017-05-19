@@ -29,11 +29,6 @@ typedef std::map<std::string,CThostFtdcInstrumentField>		T_MAP_BASEDATA;		///< »
 class CTPQuoImage : public CThostFtdcTraderSpi
 {
 public:
-	/**
-	 * @brief				¹¹Ôì
-	 * @param[in]			oConfig			CTPÁ´Â·ÅäÖÃÐÅÏ¢
-	 */
-	CTPQuoImage( const CTPLinkConfig& oConfig );
 	CTPQuoImage();
 
 	/**
@@ -84,7 +79,6 @@ protected:///< CThostFtdcTraderSpiµÄ»Øµ÷½Ó¿Ú
 protected:
 	bool					m_bIsResponded;				///< ·µ»ØÍê³É
 	unsigned short			m_nTrdReqID;				///< ½»Ò×apiÇëÇóID
-	CTPLinkConfig			m_oSvrConfig;				///< CTPÁ´Â·ÅäÖÃÐÅÏ¢
 	CThostFtdcTraderApi*	m_pTraderApi;				///< ½»Ò×Ä£¿é½Ó¿Ú
 	T_MAP_BASEDATA			m_mapBasicData;				///< ÊÐ³¡ÉÌÆ·»ù´¡Êý¾Ý¼¯ºÏ
 	CriticalObject			m_oLock;					///< ÁÙ½çÇø¶ÔÏó
