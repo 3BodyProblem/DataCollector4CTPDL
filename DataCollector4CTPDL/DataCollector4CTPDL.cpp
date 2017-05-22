@@ -76,10 +76,11 @@ int QuoCollector::Execute()
 	{
 		try
 		{
+			SimpleTask::Sleep( 1000 );
+
 /*			///< 初始化业务顺序的逻辑
 			if( true == m_oInitFlag.GetFlag() )
 			{
-				SimpleTask::Sleep( 1000 );
 				DataNodeService::GetSerivceObj().WriteInfo( "DataIOEngine::Execute() : [NOTICE] Enter Service Initializing Time ......" );
 
 				if( 0 != (nErrorCode=m_oDatabaseIO.RecoverDatabase()) )

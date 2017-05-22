@@ -4,13 +4,10 @@
 
 typedef struct
 {
-	unsigned short				MsgID;					///< Message ID
-	unsigned short				MsgLen;					///< Message Length
-	unsigned short				Serial;						//商品序号
-	char						Type;						//分类
 	char						Code[20];					//合约代码
 	char						Name[40];					//合约名称
 	unsigned long				LotFactor;					//手
+	char						Type;						//分类
 	//	unsigned long			PreClosePx;					//合约昨收(如遇除权除息则为调整后的收盘价格)(精确到厘)//[*放大倍数]
 	//	unsigned long			PreSettlePx;				//合约昨结//[*放大倍数]
 	char						Filler[8];
@@ -32,13 +29,11 @@ typedef struct
 
 typedef struct
 {
-	unsigned short				MsgID;						///< Message ID
-	unsigned short				MsgLen;						///< Message Length
 	char						Code[20];					//合约代码
 	int							LeavesQty;					//未平仓合约数 = 昨持仓 单位是(张)
 	unsigned long				UpLimit;					//当日期权涨停价格(精确到厘) //[*放大倍数]
 	unsigned long				DownLimit;					//当日期权跌停价格(精确到厘) //[*放大倍数]
-} tagCTPData;
+} tagCTPRefParameter;
 
 
 typedef struct
@@ -50,10 +45,6 @@ typedef struct
 
 typedef struct
 {
-	unsigned short				MsgID;					///< Message ID
-	unsigned short				MsgLen;					///< Message Length
-	unsigned short              Date;                   //日期(mmdd)
-	unsigned int				DataTimeStamp;			//时间戳(HHMMSSmmm)
     char						Code[20];				//商品代码<2009-1-21 Lumy更改>
     unsigned long				High;                   //最高价格[* 放大倍数]
     unsigned long				Open;                   //开盘价格[* 放大倍数]
@@ -71,6 +62,8 @@ typedef struct
     unsigned __int64			OpenInterest;           //持仓量[股]
     tagCcComm_BuySell			Buy[5];                 //委托买盘
     tagCcComm_BuySell			Sell[5];                //委托卖盘
+	unsigned short              Date;                   //日期(mmdd)
+	unsigned int				DataTimeStamp;			//时间戳(HHMMSSmmm)
 } tagCTPSnapData;
 
 

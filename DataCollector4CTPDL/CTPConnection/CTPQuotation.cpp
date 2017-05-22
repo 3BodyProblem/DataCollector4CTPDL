@@ -287,14 +287,12 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 {
 	double							dRate = 1.;				///< 放大倍数
 	int								nSerial = 0;			///< 商品在码表的索引值
+	tagCTPRefParameter				tagParam = { 0 };
 	tagCTPSnapData					tagSnapTable = { 0 };	///< 快照结构
 	unsigned int					nSnapTradingDate = 0;	///< 快照交易日期
 
 	::memcpy( tagSnapTable.Code, pQuotationData->InstrumentID, sizeof(tagSnapTable.Code) );
-/*	if( (nSerial = CodeHash::GetInstance().Code2Serial( tagSnapTable.Code, eMkID )) < 0 )
-	{
-		return;
-	}*/
+	::memcpy( tagParam.Code, pQuotationData->InstrumentID, sizeof(tagParam.Code) );
 
 	tagCTPReferenceData	refNameTable;
 //	tagCTPSnapData&					refNameTable = m_oRefTable[nSerial];	///< 码表结构
@@ -302,15 +300,15 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 //	tagSnapTable = m_oSnapTable[nSerial];
 	//assert( strncmp( refNameTable.Code, tagSnapTable.Code, sizeof(tagSnapTable.Code) )==0 );
 
-/*	if( true == bInitialize ) {	///< 初始化行情
-		refNameTable.LeavesQty = pQuotationData->PreOpenInterest*dRate+0.5;
+	if( true == bInitialize ) {	///< 初始化行情
+		tagParam.LeavesQty = pQuotationData->PreOpenInterest*dRate+0.5;
 	}
 	if( pQuotationData->UpperLimitPrice > 0 ) {
-		refNameTable.UpLimit = pQuotationData->UpperLimitPrice*dRate+0.5;
+		tagParam.UpLimit = pQuotationData->UpperLimitPrice*dRate+0.5;
 	}
 	if( pQuotationData->LowerLimitPrice > 0 ) {
-		refNameTable.DownLimit = pQuotationData->LowerLimitPrice*dRate+0.5;
-	}*/
+		tagParam.DownLimit = pQuotationData->LowerLimitPrice*dRate+0.5;
+	}
 
 	tagSnapTable.UpperPrice = pQuotationData->UpperLimitPrice*dRate+0.5;
 	tagSnapTable.LowerPrice = pQuotationData->LowerLimitPrice*dRate+0.5;
@@ -370,11 +368,11 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 
 	if( true == bInitialize )
 	{
-//		QuoCollector::GetCollector()->OnImage( id, data, len, lastflag );
+		QuoCollector::GetCollector()->OnData( 1001, (char*)&tagParam, sizeof(tagParam), false );
 	}
 	else
 	{
-//		QuoCollector::GetCollector()->OnData( ID, pdatga, len, pushflag );
+		QuoCollector::GetCollector()->OnData( 1002, (char*)&tagSnapTable, sizeof(tagSnapTable), false );
 	}
 }
 

@@ -202,10 +202,53 @@ void CTPQuoImage::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CT
 
 		if( false == m_bIsResponded )
 		{	///< 判断为是否需要过滤的商品
-			CriticalLock	section( m_oLock );
+			CriticalLock					section( m_oLock );
+			tagCTPReferenceData				tagName = { 0 };							///< 商品基础信息结构
+			tagCTPRefParameter				tagParam = { 0 };
+			tagCTPSnapData					tagSnapTable = { 0 };	///< 快照结构
+			CThostFtdcInstrumentField&		refSnap = *pInstrument;						///< 交易请求接口返回结构
+
 			m_mapBasicData[std::string(pInstrument->InstrumentID)] = *pInstrument;
 
-///<			QuoCollector::GetCollector()->OnImage( id, data, len, lastflag );
+			::strncpy( tagName.Code, refSnap.InstrumentID, sizeof(tagName.Code) );		///< 商品代码
+			::strncpy( tagParam.Code, refSnap.InstrumentID, sizeof(tagParam.Code) );		///< 商品代码
+			::memcpy( tagSnapTable.Code, refSnap.InstrumentID, sizeof(tagSnapTable.Code) );
+			::strncpy( tagName.Name, refSnap.InstrumentName, sizeof(tagName.Code) );	///< 商品名称
+//			tagName.Type = QuotationData::GetMkInfo().GetCategoryIndication( refMkID );	///< 期权的分类
+//			tagName.ObjectMId = refMkID.GetUnderlyingMarketID();						///< 标的市场编号, 上海期货 0  大连期货 1  郑州期货 2 上海期权 3  大连期权 4  郑州期权 5
+//			tagName.LotFactor = refMkRules[refMkID.ParsePreNameFromCode(tagName.Code)].nLotFactor;///< 交易单位(手比率)支持小数
+			tagName.DeliveryDate = ::atol(refSnap.StartDelivDate);						///< 交割日(YYYYMMDD)
+			tagName.StartDate = ::atol(refSnap.OpenDate);								///< 首个交易日(YYYYMMDD)
+			tagName.EndDate = ::atol(refSnap.ExpireDate);								///< 最后交易日(YYYYMMDD), 即 到期日
+			tagName.ExpireDate = tagName.EndDate;										///< 到期日(YYYYMMDD)
+			tagName.ContractMult = refSnap.VolumeMultiple;
+//			if( EID_Mk_OPTION == CTPMkID::SecurityType() )
+			{
+				///< 标的代码
+				::memcpy( tagName.UnderlyingCode, refSnap.UnderlyingInstrID, sizeof(tagName.UnderlyingCode) );
+				tagName.PriceLimitType = 'N';											///< 涨跌幅限制类型(N 有涨跌幅)(R 无涨跌幅)
+				tagName.LotSize = 1;													///< 手比率，期权为1张
+//				tagName.XqDate = refMkID.ParseExerciseDateFromCode( tagName.Code );		///< 行权日(YYYYMM), 解析自code
+				///< 行权价格(精确到厘) //[*放大倍数] 
+//				tagName.XqPrice = refSnap.StrikePrice*QuotationData::GetMkInfo().GetRateByCategory(tagName.Type)+0.5;
+			}
+/*			else if( EID_Mk_FUTURE == CTPMkID::SecurityType() )
+			{
+				tagName.LotSize = refMkRules[refMkID.ParsePreNameFromCode(tagName.Code)].nFutLotSize;	///< 手比率
+			}*/
+
+//			tagName.TypePeriodIdx = refMkRules[refMkID.ParsePreNameFromCode(tagName.Code)].nPeriodIdx;	///< 分类交易时间段位置
+/*			const DataRules::tagPeriods& oPeriod = refMkRules[tagName.TypePeriodIdx];
+			int	stime = ((oPeriod.nPeriod[0][0]/60)*100 + oPeriod.nPeriod[0][0]%60)*100;				///< 合约的交易时段的起始点
+			if( stime == EARLY_OPEN_TIME ) {
+				tagName.EarlyNightFlag = 1;
+			} else {
+				tagName.EarlyNightFlag = 2;
+			}*/
+
+			QuoCollector::GetCollector()->OnImage( 1000, (char*)&tagName, sizeof(tagName), bIsLast );
+			QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagParam, sizeof(tagParam), bIsLast );
+			QuoCollector::GetCollector()->OnImage( 1002, (char*)&tagSnapTable, sizeof(tagSnapTable), bIsLast );
 		}
 	}
 
