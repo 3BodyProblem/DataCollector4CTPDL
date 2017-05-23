@@ -84,6 +84,11 @@ public:
 	 */
 	const std::string&			GetExchangeID() const;
 
+	/**
+	 * @brief					获取市场编号
+	 */
+	unsigned int				GetMarketID() const;
+
 private:
 	unsigned int				m_nMarketID;			///< 市场编号
 	std::string					m_sExchangeID;			///< 交易所编号

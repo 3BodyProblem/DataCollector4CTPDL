@@ -2,6 +2,7 @@
 #include <exception>
 #include <algorithm>
 #include <functional>
+#include "Configuration.h"
 #include "UnitTest/UnitTest.h"
 #include "DataCollector4CTPDL.h"
 
@@ -179,6 +180,11 @@ extern "C"
 	__declspec(dllexport) int __stdcall	GetStatus()
 	{
 		return QuoCollector::GetCollector().GetCollectorStatus();
+	}
+
+	__declspec(dllexport) int __stdcall	GetMarketID()
+	{
+		return Configuration::GetConfig().GetMarketID();
 	}
 
 	__declspec(dllexport) void __stdcall	ExecuteUnitTest()

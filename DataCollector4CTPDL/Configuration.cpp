@@ -145,6 +145,7 @@ int Configuration::Initialize()
 	int					nErrCode = 0;
     char				pszTmp[1024] = { 0 };
 
+	m_nMarketID = 14;
     ::GetModuleFileName( g_oModule, pszTmp, sizeof(pszTmp) );
     sPath = pszTmp;
     sPath = sPath.substr( 0, sPath.find(".dll") ) + ".ini";
@@ -171,6 +172,11 @@ int Configuration::Initialize()
 	}
 
 	return 0;
+}
+
+unsigned int Configuration::GetMarketID() const
+{
+	return m_nMarketID;
 }
 
 const std::string& Configuration::GetExchangeID() const

@@ -3,6 +3,7 @@ EXPORTS
 	Release
 	RecoverQuotation
 	GetStatus
+	GetMarketID
 	ExecuteUnitTest
 
 

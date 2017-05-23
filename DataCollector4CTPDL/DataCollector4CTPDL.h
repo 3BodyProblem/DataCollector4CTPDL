@@ -126,6 +126,11 @@ extern "C"
 	__declspec(dllexport) int __stdcall		GetStatus();
 
 	/**
+	 * @brief								获取市场编号
+	 */
+	__declspec(dllexport) int __stdcall		GetMarketID();
+
+	/**
 	 * @brief								单元测试导出函数
 	 */
 	__declspec(dllexport) void __stdcall	ExecuteUnitTest();
