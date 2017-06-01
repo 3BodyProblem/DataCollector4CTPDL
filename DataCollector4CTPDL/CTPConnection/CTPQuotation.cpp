@@ -72,7 +72,7 @@ CTPWorkStatus&	CTPWorkStatus::operator= ( enum E_SS_Status eWorkStatus )
 
 
 CTPQuotation::CTPQuotation()
- : m_pCTPApi( NULL )
+ : m_pCTPApi( NULL ), m_nCodeCount( 0 )
 {
 }
 
@@ -233,6 +233,7 @@ void CTPQuotation::OnRspUserLogin( CThostFtdcRspUserLoginField *pRspUserLogin, C
 {
 	CriticalLock	section( m_oLock );
 
+	m_nCodeCount = 0;
 	m_setRecvCode.clear();				///< 清空收到的代码集合记录
 
     if( pRspInfo->ErrorID != 0 )
@@ -251,6 +252,13 @@ void CTPQuotation::OnRspUserLogin( CThostFtdcRspUserLoginField *pRspUserLogin, C
 		m_oWorkStatus = ET_SS_LOGIN;				///< 更新CTPQuotation会话的状态
 		SubscribeQuotation();
 	}
+}
+
+unsigned int CTPQuotation::GetCodeCount()
+{
+	CriticalLock	section( m_oLock );
+
+	return m_nCodeCount;
 }
 
 void CTPQuotation::OnRtnDepthMarketData( CThostFtdcDepthMarketDataField *pMarketData )
@@ -272,6 +280,7 @@ void CTPQuotation::OnRtnDepthMarketData( CThostFtdcDepthMarketDataField *pMarket
 		if( m_setRecvCode.find( pMarketData->InstrumentID ) == m_setRecvCode.end() )
 		{
 			m_setRecvCode.insert( pMarketData->InstrumentID );
+			m_nCodeCount = m_setRecvCode.size();
 		}
 		else
 		{

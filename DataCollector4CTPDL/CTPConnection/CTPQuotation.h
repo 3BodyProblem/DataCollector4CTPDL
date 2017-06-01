@@ -91,6 +91,11 @@ public:///< 公共方法函数
 	CTPWorkStatus&		GetWorkStatus();
 
 	/**
+	 * @brief			获取代码数量
+	 */
+	unsigned int		GetCodeCount();
+
+	/**
 	 * @brief			发送登录请求包
 	 */
     void				SendLoginRequest();
@@ -114,6 +119,7 @@ private:
 	CThostFtdcMdApi*	m_pCTPApi;				///< 第三方提供的cffex接口
 	CTPWorkStatus		m_oWorkStatus;			///< 工作状态
 	T_SET_INSTRUMENTID	m_setRecvCode;			///< 收到的代码集合
+	unsigned int		m_nCodeCount;			///< 收到的快照商品数量
 	CriticalObject		m_oLock;				///< 临界区对象
 };
 

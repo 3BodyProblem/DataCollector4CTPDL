@@ -142,6 +142,11 @@ int QuoCollector::RecoverQuotation()
 		SimpleTask::Sleep( 1000 * 1 );
 	}
 
+	if( m_oQuotationData.GetCodeCount() > 0 )
+	{
+		m_oQuotationData.GetWorkStatus() = ET_SS_WORKING;
+	}
+
 	if( ET_SS_WORKING == m_oQuotationData.GetWorkStatus() )
 	{
 		return 0;
