@@ -80,6 +80,11 @@ public:
 	 */
 	int							GetSubscribeCodeList( char (&pszCodeList)[1024*5][20], unsigned int nListSize );
 
+	/**
+	 * @brief					停止
+	 */
+	void						Halt();
+
 protected:
 	/**
 	 * @brief					任务函数(内循环)
