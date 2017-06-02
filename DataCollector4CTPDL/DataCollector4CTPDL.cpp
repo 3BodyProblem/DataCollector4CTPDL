@@ -151,7 +151,7 @@ extern "C"
 		return QuoCollector::GetCollector().Initialize( pIDataHandle );
 	}
 
-	__declspec(dllexport) void __stdcall	Release()
+	__declspec(dllexport) void __stdcall Release()
 	{
 		QuoCollector::GetCollector().Release();
 	}
