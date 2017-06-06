@@ -296,70 +296,74 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 {
 	double							dRate = 1.;				///< 放大倍数
 	int								nSerial = 0;			///< 商品在码表的索引值
-	tagCTPRefParameter				tagParam = { 0 };
-	tagCTPSnapData					tagSnapTable = { 0 };	///< 快照结构
+//	tagDLReferenceData_LF1003		tagName = { 0 };		///< 商品基础信息结构
+	tagDLSnapData_HF1005			tagSnapHF = { 0 };		///< 高速行情快照
+	tagDLSnapData_LF1004			tagSnapLF = { 0 };		///< 低速行情快照
+	tagDLSnapBuySell_HF1006			tagSnapBS = { 0 };		///< 档位信息
 	unsigned int					nSnapTradingDate = 0;	///< 快照交易日期
 
-	::memcpy( tagSnapTable.Code, pQuotationData->InstrumentID, sizeof(tagSnapTable.Code) );
-	::memcpy( tagParam.Code, pQuotationData->InstrumentID, sizeof(tagParam.Code) );
+//	::strncpy( tagName.Code, pQuotationData->InstrumentID, sizeof(tagName.Code) );
+	::memcpy( tagSnapHF.Code, pQuotationData->InstrumentID, sizeof(tagSnapHF.Code) );
+	::memcpy( tagSnapLF.Code, pQuotationData->InstrumentID, sizeof(tagSnapLF.Code) );
+	::memcpy( tagSnapBS.Code, pQuotationData->InstrumentID, sizeof(tagSnapBS.Code) );
 
-	tagCTPReferenceData	refNameTable;
 //	tagCTPSnapData&					refNameTable = m_oRefTable[nSerial];	///< 码表结构
 //	dRate = QuotationData::GetMkInfo().GetRateByCategory( refNameTable.Type );
 //	tagSnapTable = m_oSnapTable[nSerial];
 	//assert( strncmp( refNameTable.Code, tagSnapTable.Code, sizeof(tagSnapTable.Code) )==0 );
 
 	if( true == bInitialize ) {	///< 初始化行情
-		tagParam.LeavesQty = pQuotationData->PreOpenInterest*dRate+0.5;
+		tagSnapLF.PreOpenInterest = pQuotationData->PreOpenInterest*dRate+0.5;
 	}
 	if( pQuotationData->UpperLimitPrice > 0 ) {
-		tagParam.UpLimit = pQuotationData->UpperLimitPrice*dRate+0.5;
+		tagSnapLF.UpperPrice = pQuotationData->UpperLimitPrice*dRate+0.5;
 	}
 	if( pQuotationData->LowerLimitPrice > 0 ) {
-		tagParam.DownLimit = pQuotationData->LowerLimitPrice*dRate+0.5;
+		tagSnapLF.LowerPrice = pQuotationData->LowerLimitPrice*dRate+0.5;
 	}
 
-	tagSnapTable.UpperPrice = pQuotationData->UpperLimitPrice*dRate+0.5;
-	tagSnapTable.LowerPrice = pQuotationData->LowerLimitPrice*dRate+0.5;
-	tagSnapTable.Open = pQuotationData->OpenPrice*dRate+0.5;
-	tagSnapTable.High = pQuotationData->HighestPrice*dRate+0.5;
-	tagSnapTable.Low = pQuotationData->LowestPrice*dRate+0.5;
-	tagSnapTable.Close = pQuotationData->ClosePrice*dRate+0.5;
-	tagSnapTable.Now = pQuotationData->LastPrice*dRate+0.5;
-	tagSnapTable.PreClose = pQuotationData->PreClosePrice*dRate+0.5;
-	tagSnapTable.PreSettlePrice = pQuotationData->PreSettlementPrice*dRate+0.5;
-	tagSnapTable.SettlePrice = pQuotationData->SettlementPrice*dRate+0.5;
+	tagSnapLF.Open = pQuotationData->OpenPrice*dRate+0.5;
+	tagSnapLF.Close = pQuotationData->ClosePrice*dRate+0.5;
+	tagSnapLF.PreClose = pQuotationData->PreClosePrice*dRate+0.5;
+	tagSnapLF.PreSettlePrice = pQuotationData->PreSettlementPrice*dRate+0.5;
+	tagSnapLF.SettlePrice = pQuotationData->SettlementPrice*dRate+0.5;
+	tagSnapLF.PreOpenInterest = pQuotationData->PreOpenInterest;
+
+	tagSnapHF.High = pQuotationData->HighestPrice*dRate+0.5;
+	tagSnapHF.Low = pQuotationData->LowestPrice*dRate+0.5;
+	tagSnapHF.Now = pQuotationData->LastPrice*dRate+0.5;
+	tagSnapHF.Position = pQuotationData->OpenInterest;
+	tagSnapHF.Volume = pQuotationData->Volume;
+
 //	if( EV_MK_ZZ == eMkID )		///< 郑州市场的成交金额特殊处理： = 金额 * 合约单位
 	{
-//		tagSnapTable.Amount = pQuotationData->Turnover * refNameTable.ContractMult;
+//		tagSnapHF.Amount = pQuotationData->Turnover * refNameTable.ContractMult;
 	}
 //	else
 	{
-		tagSnapTable.Amount = pQuotationData->Turnover;
+		tagSnapHF.Amount = pQuotationData->Turnover;
 	}
-	tagSnapTable.Volume = pQuotationData->Volume;
-	tagSnapTable.PreOpenInterest = pQuotationData->PreOpenInterest;
-	tagSnapTable.OpenInterest = pQuotationData->OpenInterest;
-	tagSnapTable.Buy[0].Price = pQuotationData->BidPrice1*dRate+0.5;
-	tagSnapTable.Buy[0].Volume = pQuotationData->BidVolume1;
-	tagSnapTable.Sell[0].Price = pQuotationData->AskPrice1*dRate+0.5;
-	tagSnapTable.Sell[0].Volume = pQuotationData->AskVolume1;
-	tagSnapTable.Buy[1].Price = pQuotationData->BidPrice2*dRate+0.5;
-	tagSnapTable.Buy[1].Volume = pQuotationData->BidVolume2;
-	tagSnapTable.Sell[1].Price = pQuotationData->AskPrice2*dRate+0.5;
-	tagSnapTable.Sell[1].Volume = pQuotationData->AskVolume2;
-	tagSnapTable.Buy[2].Price = pQuotationData->BidPrice3*dRate+0.5;
-	tagSnapTable.Buy[2].Volume = pQuotationData->BidVolume3;
-	tagSnapTable.Sell[2].Price = pQuotationData->AskPrice3*dRate+0.5;
-	tagSnapTable.Sell[2].Volume = pQuotationData->AskVolume3;
-	tagSnapTable.Buy[3].Price = pQuotationData->BidPrice4*dRate+0.5;
-	tagSnapTable.Buy[3].Volume = pQuotationData->BidVolume4;
-	tagSnapTable.Sell[3].Price = pQuotationData->AskPrice4*dRate+0.5;
-	tagSnapTable.Sell[3].Volume = pQuotationData->AskVolume4;
-	tagSnapTable.Buy[4].Price = pQuotationData->BidPrice5*dRate+0.5;
-	tagSnapTable.Buy[4].Volume = pQuotationData->BidVolume5;
-	tagSnapTable.Sell[4].Price = pQuotationData->AskPrice5*dRate+0.5;
-	tagSnapTable.Sell[4].Volume = pQuotationData->AskVolume5;
+
+	tagSnapBS.Buy[0].Price = pQuotationData->BidPrice1*dRate+0.5;
+	tagSnapBS.Buy[0].Volume = pQuotationData->BidVolume1;
+	tagSnapBS.Sell[0].Price = pQuotationData->AskPrice1*dRate+0.5;
+	tagSnapBS.Sell[0].Volume = pQuotationData->AskVolume1;
+	tagSnapBS.Buy[1].Price = pQuotationData->BidPrice2*dRate+0.5;
+	tagSnapBS.Buy[1].Volume = pQuotationData->BidVolume2;
+	tagSnapBS.Sell[1].Price = pQuotationData->AskPrice2*dRate+0.5;
+	tagSnapBS.Sell[1].Volume = pQuotationData->AskVolume2;
+	tagSnapBS.Buy[2].Price = pQuotationData->BidPrice3*dRate+0.5;
+	tagSnapBS.Buy[2].Volume = pQuotationData->BidVolume3;
+	tagSnapBS.Sell[2].Price = pQuotationData->AskPrice3*dRate+0.5;
+	tagSnapBS.Sell[2].Volume = pQuotationData->AskVolume3;
+	tagSnapBS.Buy[3].Price = pQuotationData->BidPrice4*dRate+0.5;
+	tagSnapBS.Buy[3].Volume = pQuotationData->BidVolume4;
+	tagSnapBS.Sell[3].Price = pQuotationData->AskPrice4*dRate+0.5;
+	tagSnapBS.Sell[3].Volume = pQuotationData->AskVolume4;
+	tagSnapBS.Buy[4].Price = pQuotationData->BidPrice5*dRate+0.5;
+	tagSnapBS.Buy[4].Volume = pQuotationData->BidVolume5;
+	tagSnapBS.Sell[4].Price = pQuotationData->AskPrice5*dRate+0.5;
+	tagSnapBS.Sell[4].Volume = pQuotationData->AskVolume5;
 
 	char	pszTmpDate[12] = { 0 };
 	::memcpy( pszTmpDate, pQuotationData->UpdateTime, sizeof(TThostFtdcTimeType) );
@@ -371,18 +375,18 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 	nSnapUpdateTime = nSnapUpdateTime*100+atol(&pszTmpDate[6]);
 	if( (nSnapTradingDate=::atol( pQuotationData->TradingDay )) >= 0 && nSnapUpdateTime > 0 )
 	{	///< 更新日期+时间
-		tagSnapTable.DataTimeStamp = nSnapUpdateTime*1000;
+//		tagSnapTable.DataTimeStamp = nSnapUpdateTime*1000;
 //		GetMkInfo().SetDateTime( nSnapTradingDate, nSnapUpdateTime );
 	}
 
 	if( true == bInitialize )
 	{
-		QuoCollector::GetCollector()->OnData( 1001, (char*)&tagParam, sizeof(tagParam), false );
+		///< to do:
 	}
-	else
-	{
-		QuoCollector::GetCollector()->OnData( 1002, (char*)&tagSnapTable, sizeof(tagSnapTable), false );
-	}
+
+	QuoCollector::GetCollector()->OnData( 1004, (char*)&tagSnapLF, sizeof(tagSnapLF), false );
+	QuoCollector::GetCollector()->OnData( 1005, (char*)&tagSnapHF, sizeof(tagSnapHF), false );
+	QuoCollector::GetCollector()->OnData( 1006, (char*)&tagSnapBS, sizeof(tagSnapBS), false );
 }
 
 void CTPQuotation::OnRspError( CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast )
