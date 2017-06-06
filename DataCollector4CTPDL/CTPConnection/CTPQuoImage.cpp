@@ -63,7 +63,13 @@ int CTPQuoImage::FreshCache()
 			return -3;
 		}
 	}
-
+/*
+	tagDLMarketInfo_LF1000		tagMkInfo = { 0 };
+	tagDLKindDetail_LF1001		tagKindList[6] = { 0 };
+	tagDLMarketStatus_HF1007	tagStatus = { 0 };
+	QuoCollector::GetCollector()->OnImage( 1000, (char*)&tagMkInfo, sizeof(tagMkInfo), true );
+	QuoCollector::GetCollector()->OnImage( 1007, (char*)&tagStatus, sizeof(tagStatus), true );
+*/
 	FreeApi();														///< ÊÍ·Åapi£¬½áÊøÇëÇó
 	CriticalLock	section( m_oLock );
 	unsigned int	nSize = m_mapBasicData.size();
