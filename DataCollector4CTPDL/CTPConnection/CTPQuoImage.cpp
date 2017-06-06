@@ -63,19 +63,77 @@ int CTPQuoImage::FreshCache()
 			return -3;
 		}
 	}
-/*
-	tagDLMarketInfo_LF1000		tagMkInfo = { 0 };
-	tagDLKindDetail_LF1001		tagKindList[6] = { 0 };
-	tagDLMarketStatus_HF1007	tagStatus = { 0 };
-	QuoCollector::GetCollector()->OnImage( 1000, (char*)&tagMkInfo, sizeof(tagMkInfo), true );
-	QuoCollector::GetCollector()->OnImage( 1007, (char*)&tagStatus, sizeof(tagStatus), true );
-*/
+
+	BuildBasicData();
 	FreeApi();														///< 释放api，结束请求
+
 	CriticalLock	section( m_oLock );
 	unsigned int	nSize = m_mapBasicData.size();
 	QuoCollector::GetCollector()->OnLog( TLV_INFO, "CTPQuoImage::FreshCache() : ............. [OK] basic data freshed(%d) ...........", nSize );
 
 	return nSize;
+}
+
+void CTPQuoImage::BuildBasicData()
+{
+	tagDLMarketInfo_LF1000		tagMkInfo = { 0 };
+	tagDLMarketStatus_HF1007	tagStatus = { 0 };
+
+	::strcpy( tagMkInfo.Key, "marketinfo" );
+	tagMkInfo.MarketStatus = 0;
+	tagMkInfo.WareCount = m_mapBasicData.size();
+	tagMkInfo.MarketDate = DateTime::Now().DateToLong();
+	tagMkInfo.MarketTime = DateTime::Now().TimeToLong();
+	tagMkInfo.MarketID = Configuration::GetConfig().GetMarketID();
+
+	///< 配置行情时段信息
+	tagMkInfo.PeriodsCount = 4;			///< 交易时段设置
+	tagMkInfo.MarketPeriods[0][0] = 21*60;		///< 第一段，取夜盘的时段的最大范围
+	tagMkInfo.MarketPeriods[0][1] = 23*60+30;
+	tagMkInfo.MarketPeriods[1][0] = 9*60;		///< 第二段
+	tagMkInfo.MarketPeriods[1][1] = 10*60+15;
+	tagMkInfo.MarketPeriods[2][0] = 10*60+30;	///< 第三段
+	tagMkInfo.MarketPeriods[2][1] = 11*60+30;
+	tagMkInfo.MarketPeriods[3][0] = 13*60+30;	///< 第四段
+	tagMkInfo.MarketPeriods[3][1] = 15*60;
+
+	///< 配置分类信息
+	tagMkInfo.KindCount = 4;
+	{
+		tagDLKindDetail_LF1001		tagKind = { 0 };
+
+		::strncpy( tagKind.KindName, "指数保留", 8 );
+		tagKind.PriceRate = 0;
+		tagKind.LotFactor = 0;
+	}
+	{
+		tagDLKindDetail_LF1001		tagKind = { 0 };
+
+		::strncpy( tagKind.KindName, "大连期指", 8 );
+		tagKind.PriceRate = 2;
+		tagKind.LotFactor = 100;
+	}
+	{
+		tagDLKindDetail_LF1001		tagKind = { 0 };
+
+		::strncpy( tagKind.KindName, "大连合约", 8 );
+		tagKind.PriceRate = 2;
+		tagKind.LotFactor = 100;
+	}
+	{
+		tagDLKindDetail_LF1001		tagKind = { 0 };
+
+		::strncpy( tagKind.KindName, "大连期权", 8 );
+		tagKind.PriceRate = 2;
+		tagKind.LotFactor = 100;
+	}
+
+	::strcpy( tagStatus.Key, "marketstatus" );
+	tagStatus.MarketStatus = 0;
+	tagStatus.MarketTime = DateTime::Now().TimeToLong();
+
+	QuoCollector::GetCollector()->OnImage( 1000, (char*)&tagMkInfo, sizeof(tagMkInfo), true );
+	QuoCollector::GetCollector()->OnImage( 1007, (char*)&tagStatus, sizeof(tagStatus), true );
 }
 
 int CTPQuoImage::FreeApi()

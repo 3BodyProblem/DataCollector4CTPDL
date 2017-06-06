@@ -64,6 +64,11 @@ protected:///< 自有方法函数
     void					SendLoginRequest();
 
 	/**
+	 * @brief				建立推送基础数据
+	 */
+	void					BuildBasicData();
+
+	/**
 	 * @brief				跳出响应等待
 	 */
 	void					BreakOutWaitingResponse();
