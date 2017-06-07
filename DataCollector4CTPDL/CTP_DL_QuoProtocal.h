@@ -12,8 +12,8 @@ typedef struct
 	unsigned int				MarketTime;					///< 市场时间
 	unsigned int				KindCount;					///< 类别数量
 	unsigned int				WareCount;					///< 商品数量
-	unsigned short				PeriodsCount;				///< 交易时段信息列表长度
-	unsigned short				MarketPeriods[8][2];		///< 交易时段描述信息列表
+	unsigned int				PeriodsCount;				///< 交易时段信息列表长度
+	unsigned int				MarketPeriods[8][2];		///< 交易时段描述信息列表
 } tagDLMarketInfo_LF1000;
 
 
@@ -21,9 +21,9 @@ typedef struct
 {
 	char						Key[20];					///< 索引键值
 	char						KindName[32];				///< 类别的名称
-	unsigned short				PriceRate;					///< 价格放大倍数[10的多少次方]
-	unsigned short				LotFactor;					///< “手”比率
-	unsigned short				WareCount;					///< 该分类的商品数量
+	unsigned int				PriceRate;					///< 价格放大倍数[10的多少次方]
+	unsigned int				LotFactor;					///< “手”比率
+	unsigned int				WareCount;					///< 该分类的商品数量
 } tagDLKindDetail_LF1001;
 
 
