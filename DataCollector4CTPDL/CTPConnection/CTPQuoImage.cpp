@@ -79,11 +79,8 @@ void CTPQuoImage::BuildBasicData()
 	tagDLMarketInfo_LF1000		tagMkInfo = { 0 };
 	tagDLMarketStatus_HF1007	tagStatus = { 0 };
 
-	::strcpy( tagMkInfo.Key, "marketinfo" );
-	tagMkInfo.MarketStatus = 0;
+	::strcpy( tagMkInfo.Key, "mkinfo" );
 	tagMkInfo.WareCount = m_mapBasicData.size();
-	tagMkInfo.MarketDate = DateTime::Now().DateToLong();
-	tagMkInfo.MarketTime = DateTime::Now().TimeToLong();
 	tagMkInfo.MarketID = Configuration::GetConfig().GetMarketID();
 
 	///< 配置行情时段信息
@@ -128,8 +125,9 @@ void CTPQuoImage::BuildBasicData()
 		tagKind.LotFactor = 100;
 	}
 
-	::strcpy( tagStatus.Key, "marketstatus" );
+	::strcpy( tagStatus.Key, "mkstatus" );
 	tagStatus.MarketStatus = 0;
+	tagStatus.MarketDate = DateTime::Now().DateToLong();
 	tagStatus.MarketTime = DateTime::Now().TimeToLong();
 
 	QuoCollector::GetCollector()->OnImage( 1000, (char*)&tagMkInfo, sizeof(tagMkInfo), true );

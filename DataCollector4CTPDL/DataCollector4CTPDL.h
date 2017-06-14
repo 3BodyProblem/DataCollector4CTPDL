@@ -69,8 +69,11 @@ public:
 
 	/**
 	 * @brief					取得采集模块的当前状态
+	 * @param[out]				pszStatusDesc				返回出状态描述串
+	 * @param[in,out]			nStrLen						输入描述串缓存长度，输出描述串有效内容长度
+	 * @return					返回模块当前状态值
 	 */
-	enum E_SS_Status			GetCollectorStatus();
+	enum E_SS_Status			GetCollectorStatus( char* pszStatusDesc, unsigned int& nStrLen );
 
 	/**
 	 * @brief					取得能订阅的商品
@@ -127,8 +130,11 @@ extern "C"
 
 	/**
 	 * @brief								获取模块的当前状态
+	 * @param[out]							pszStatusDesc				返回出状态描述串
+	 * @param[in,out]						nStrLen						输入描述串缓存长度，输出描述串有效内容长度
+	 * @return								返回模块当前状态值
 	 */
-	__declspec(dllexport) int __stdcall		GetStatus();
+	__declspec(dllexport) int __stdcall		GetStatus( char* pszStatusDesc, unsigned int& nStrLen );
 
 	/**
 	 * @brief								获取市场编号

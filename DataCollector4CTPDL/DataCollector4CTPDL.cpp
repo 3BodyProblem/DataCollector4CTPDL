@@ -138,8 +138,15 @@ int QuoCollector::RecoverQuotation()
 	}
 }
 
-enum E_SS_Status QuoCollector::GetCollectorStatus()
+enum E_SS_Status QuoCollector::GetCollectorStatus( char* pszStatusDesc, unsigned int& nStrLen )
 {
+	Configuration&		refCnf = Configuration::GetConfig();
+	CTPWorkStatus&		refStatus = m_oQuotationData.GetWorkStatus();
+	std::string&		sStatus = CTPWorkStatus::CastStatusStr( (enum E_SS_Status)refStatus );
+
+	nStrLen = ::sprintf( pszStatusDesc, "市场编号=%u,快照路径=%s,连接状态=%s"
+		, refCnf.GetMarketID(), refCnf.GetDumpFolder().c_str(), sStatus.c_str() );
+
 	return (enum E_SS_Status)(m_oQuotationData.GetWorkStatus());
 }
 
@@ -166,9 +173,9 @@ extern "C"
 		QuoCollector::GetCollector().Halt();
 	}
 
-	__declspec(dllexport) int __stdcall	GetStatus()
+	__declspec(dllexport) int __stdcall	GetStatus( char* pszStatusDesc, unsigned int& nStrLen )
 	{
-		return QuoCollector::GetCollector().GetCollectorStatus();
+		return QuoCollector::GetCollector().GetCollectorStatus( pszStatusDesc, nStrLen );
 	}
 
 	__declspec(dllexport) int __stdcall	GetMarketID()
