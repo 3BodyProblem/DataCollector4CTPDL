@@ -5,6 +5,7 @@ EXPORTS
 	HaltQuotation
 	GetStatus
 	GetMarketID
+	IsProxy
 	ExecuteUnitTest
 
 

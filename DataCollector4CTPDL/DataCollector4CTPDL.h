@@ -142,6 +142,11 @@ extern "C"
 	__declspec(dllexport) int __stdcall		GetMarketID();
 
 	/**
+	 * @brief								是否为行情传输的采集器
+	 */
+	__declspec(dllexport) bool __stdcall	IsProxy();
+
+	/**
 	 * @brief								单元测试导出函数
 	 */
 	__declspec(dllexport) void __stdcall	ExecuteUnitTest();

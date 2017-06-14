@@ -178,6 +178,11 @@ extern "C"
 		return QuoCollector::GetCollector().GetCollectorStatus( pszStatusDesc, nStrLen );
 	}
 
+	__declspec(dllexport) bool __stdcall IsProxy()
+	{
+		return false;
+	}
+
 	__declspec(dllexport) int __stdcall	GetMarketID()
 	{
 		return Configuration::GetConfig().GetMarketID();
