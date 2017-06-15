@@ -70,7 +70,7 @@ int QuoCollector::RecoverQuotation()
 
 	if( (nErrorCode=m_oImageData.FreshCache()) <= 0 )
 	{
-		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : failed 2 refresh image data, errorcode=%d", nErrorCode );
+		QuoCollector::GetCollector()->OnLog( TLV_WARN, "QuoCollector::RecoverQuotation() : failed 2 refresh imagedata, errorcode=%d", nErrorCode );
 		return -1;
 	}
 

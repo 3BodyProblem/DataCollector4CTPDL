@@ -300,6 +300,7 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 	tagDLSnapData_HF1005			tagSnapHF = { 0 };		///< 高速行情快照
 	tagDLSnapData_LF1004			tagSnapLF = { 0 };		///< 低速行情快照
 	tagDLSnapBuySell_HF1006			tagSnapBS = { 0 };		///< 档位信息
+	tagDLMarketStatus_HF1007		tagStatus = { 0 };		///< 市场状态信息
 	unsigned int					nSnapTradingDate = 0;	///< 快照交易日期
 
 //	::strncpy( tagName.Code, pQuotationData->InstrumentID, sizeof(tagName.Code) );
@@ -375,13 +376,11 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 	nSnapUpdateTime = nSnapUpdateTime*100+atol(&pszTmpDate[6]);
 	if( (nSnapTradingDate=::atol( pQuotationData->TradingDay )) >= 0 && nSnapUpdateTime > 0 )
 	{	///< 更新日期+时间
-//		tagSnapTable.DataTimeStamp = nSnapUpdateTime*1000;
-//		GetMkInfo().SetDateTime( nSnapTradingDate, nSnapUpdateTime );
-	}
-
-	if( true == bInitialize )
-	{
-		///< to do:
+		::strcpy( tagStatus.Key, "mkstatus" );
+		tagStatus.MarketStatus = 1;
+		tagStatus.MarketDate = nSnapTradingDate;
+		tagStatus.MarketTime = nSnapUpdateTime;
+		QuoCollector::GetCollector()->OnData( 1007, (char*)&tagStatus, sizeof(tagStatus), false );
 	}
 
 	QuoCollector::GetCollector()->OnData( 1004, (char*)&tagSnapLF, sizeof(tagSnapLF), false );
