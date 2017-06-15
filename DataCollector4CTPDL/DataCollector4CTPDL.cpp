@@ -36,20 +36,11 @@ int QuoCollector::Initialize( I_DataHandle* pIDataHandle )
 		return -2;
 	}
 
-	if( 0 != (nErrorCode = SimpleTask::Activate()) )
-	{
-		QuoCollector::GetCollector()->OnLog( TLV_ERROR, "QuoCollector::Initialize() : failed 2 initialize task thread, errorcode=%d", nErrorCode );
-		return -3;
-	}
-
 	return 0;
 }
 
 void QuoCollector::Release()
 {
-	SimpleTask::StopThread();
-	SimpleTask::Join( 1000*3 );
-//	m_pCbDataHandle = NULL;
 }
 
 I_DataHandle* QuoCollector::operator->()
@@ -65,33 +56,6 @@ I_DataHandle* QuoCollector::operator->()
 int QuoCollector::GetSubscribeCodeList( char (&pszCodeList)[1024*5][20], unsigned int nListSize )
 {
 	return m_oImageData.GetSubscribeCodeList( pszCodeList, nListSize );
-}
-
-int QuoCollector::Execute()
-{
-	QuoCollector::GetCollector()->OnLog( TLV_INFO, "QuoCollector::Execute() : enter into thread func ......" );
-/*
-	int			nErrorCode = 0;
-
-	while( true == IsAlive() )
-	{
-		try
-		{
-			SimpleTask::Sleep( 1000 );
-		}
-		catch( std::exception& err )
-		{
-			QuoCollector::GetCollector()->OnLog( TLV_INFO, "QuoCollector::Execute() : exception : %s", err.what() );
-		}
-		catch( ... )
-		{
-			QuoCollector::GetCollector()->OnLog( TLV_INFO, "QuoCollector::Execute() : unknow exception" );
-		}
-	}
-*/
-	QuoCollector::GetCollector()->OnLog( TLV_INFO, "QuoCollector::Execute() : exit thread func ......" );
-
-	return 0;
 }
 
 void QuoCollector::Halt()

@@ -84,6 +84,7 @@ protected:
 	 * @return			>=0			成功
 	 */
 	int					SubscribeQuotation();
+
 public:///< 公共方法函数
 	/**
 	 * @brief			获取会话状态信息

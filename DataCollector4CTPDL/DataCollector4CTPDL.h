@@ -29,7 +29,7 @@ enum T_LOG_LEVEL
  * @date						2017/5/15
  * @author						barry
  */
-class QuoCollector : public SimpleTask
+class QuoCollector
 {
 protected:
 	QuoCollector();
@@ -55,17 +55,24 @@ public:
 
 public:
 	/**
-	 * @brief					重载返回行情回调接口地址
-	 * @return					行情回调接口指针地址
-	 */
-	I_DataHandle*				operator->();
-
-	/**
 	 * @brief					从本地文件或行情端口重新恢复加载所有行情数据
+	 * @note					是一个同步的函数，在行情初始化完成后才会返回
 	 * @return					==0							成功
 								!=0							出错
 	 */
 	int							RecoverQuotation();
+
+	/**
+	 * @brief					停止
+	 */
+	void						Halt();
+
+public:
+	/**
+	 * @brief					重载返回行情回调接口地址
+	 * @return					行情回调接口指针地址
+	 */
+	I_DataHandle*				operator->();
 
 	/**
 	 * @brief					取得采集模块的当前状态
@@ -82,19 +89,6 @@ public:
 	 * @return					返回个数
 	 */
 	int							GetSubscribeCodeList( char (&pszCodeList)[1024*5][20], unsigned int nListSize );
-
-	/**
-	 * @brief					停止
-	 */
-	void						Halt();
-
-protected:
-	/**
-	 * @brief					任务函数(内循环)
-	 * @return					==0					成功
-								!=0					失败
-	 */
-	virtual int					Execute();
 
 protected:
 	I_DataHandle*				m_pCbDataHandle;			///< 数据(行情/日志回调接口)
@@ -115,6 +109,9 @@ extern "C"
 {
 	/**
 	 * @brief								初始化数据采集模块
+	 * @param[in]							pIDataHandle				行情功能回调
+	 * @return								==0							初始化成功
+											!=							出错
 	 */
 	__declspec(dllexport) int __stdcall		Initialize( I_DataHandle* pIDataHandle );
 
@@ -125,8 +122,16 @@ extern "C"
 
 	/**
 	 * @brief								重新初始化并加载行情数据
+	 * @note								是一个同步的函数，在行情初始化完成后才会返回
+ 	 * @return								==0							成功
+											!=0							出错
 	 */
 	__declspec(dllexport) int __stdcall		RecoverQuotation();
+
+	/**
+	 * @brief								暂时数据采集
+	 */
+	__declspec(dllexport) void __stdcall	HaltQuotation();
 
 	/**
 	 * @brief								获取模块的当前状态
@@ -138,11 +143,14 @@ extern "C"
 
 	/**
 	 * @brief								获取市场编号
+	 * @return								市场ID
 	 */
 	__declspec(dllexport) int __stdcall		GetMarketID();
 
 	/**
 	 * @brief								是否为行情传输的采集器
+	 * @return								true						是传输模块的行情采集插件
+											false						顶层源的行情采集插件
 	 */
 	__declspec(dllexport) bool __stdcall	IsProxy();
 
