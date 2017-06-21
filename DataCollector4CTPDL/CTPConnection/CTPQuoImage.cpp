@@ -5,6 +5,9 @@
 #pragma comment(lib, "./CTPConnection/thosttraderapi.lib")
 
 
+T_MAP_RATE		CTPQuoImage::m_mapRate;
+
+
 CTPQuoImage::CTPQuoImage()
  : m_pTraderApi( NULL ), m_nTrdReqID( 0 ), m_bIsResponded( false )
 {
@@ -15,6 +18,16 @@ CTPQuoImage::operator T_MAP_BASEDATA&()
 	CriticalLock	section( m_oLock );
 
 	return m_mapBasicData;
+}
+
+int CTPQuoImage::GetRate( unsigned int nKind )
+{
+	if( m_mapRate.find( nKind ) == m_mapRate.end() )
+	{
+		return m_mapRate[nKind];
+	}
+
+	return -1;
 }
 
 int CTPQuoImage::GetSubscribeCodeList( char (&pszCodeList)[1024*5][20], unsigned int nListSize )
@@ -49,6 +62,7 @@ int CTPQuoImage::FreshCache()
 	std::string		sDumpFile = GenFilePathByWeek( Configuration::GetConfig().GetDumpFolder().c_str(), pszTmpFile, DateTime::Now().DateToLong() );
 	QuotationSync::CTPSyncSaver::GetHandle().Init( sDumpFile.c_str(), DateTime::Now().DateToLong(), true );
 
+	m_mapRate.clear();												///< 清空放大倍数映射表
 	m_pTraderApi->RegisterSpi( this );								///< 将this注册为事件处理的实例
 	if( false == Configuration::GetConfig().GetTrdConfList().RegisterServer( NULL, m_pTraderApi ) )///< 注册CTP链接需要的网络配置
 	{
@@ -103,6 +117,8 @@ void CTPQuoImage::BuildBasicData()
 		::strncpy( tagKind.KindName, "指数保留", 8 );
 		tagKind.PriceRate = 0;
 		tagKind.LotFactor = 0;
+		m_mapRate[m_mapRate.size()] = tagKind.PriceRate;
+		QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagKind, sizeof(tagKind), true );
 	}
 	{
 		tagDLKindDetail_LF1001		tagKind = { 0 };
@@ -110,6 +126,8 @@ void CTPQuoImage::BuildBasicData()
 		::strncpy( tagKind.KindName, "大连期指", 8 );
 		tagKind.PriceRate = 2;
 		tagKind.LotFactor = 100;
+		m_mapRate[m_mapRate.size()] = tagKind.PriceRate;
+		QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagKind, sizeof(tagKind), true );
 	}
 	{
 		tagDLKindDetail_LF1001		tagKind = { 0 };
@@ -117,6 +135,8 @@ void CTPQuoImage::BuildBasicData()
 		::strncpy( tagKind.KindName, "大连合约", 8 );
 		tagKind.PriceRate = 2;
 		tagKind.LotFactor = 100;
+		m_mapRate[m_mapRate.size()] = tagKind.PriceRate;
+		QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagKind, sizeof(tagKind), true );
 	}
 	{
 		tagDLKindDetail_LF1001		tagKind = { 0 };
@@ -124,6 +144,8 @@ void CTPQuoImage::BuildBasicData()
 		::strncpy( tagKind.KindName, "大连期权", 8 );
 		tagKind.PriceRate = 2;
 		tagKind.LotFactor = 100;
+		m_mapRate[m_mapRate.size()] = tagKind.PriceRate;
+		QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagKind, sizeof(tagKind), true );
 	}
 
 	::strcpy( tagStatus.Key, "mkstatus" );
@@ -373,8 +395,7 @@ void CTPQuoImage::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CT
 				tagName.LotSize = 1;													///< 手比率，期权为1张
 				::memcpy( tagName.UnderlyingCode, refSnap.UnderlyingInstrID, sizeof(tagName.UnderlyingCode) );///< 标的代码
 				tagName.XqDate = ParseExerciseDateFromCode( tagName.Code );				///< 行权日(YYYYMM), 解析自code
-				///< 行权价格(精确到厘) //[*放大倍数] 
-//				tagName.XqPrice = refSnap.StrikePrice*QuotationData::GetMkInfo().GetRateByCategory(tagName.Type)+0.5;
+				tagName.XqPrice = refSnap.StrikePrice*GetRate(tagName.Kind)+0.5;		///< 行权价格(精确到厘) //[*放大倍数] 
 			}
 			else if( 2 == tagName.Kind )
 			{
@@ -389,6 +410,8 @@ void CTPQuoImage::OnRspQryInstrument( CThostFtdcInstrumentField *pInstrument, CT
 			} else {
 				tagName.EarlyNightFlag = 2;
 			}*/
+
+			tagName.PriceTick = refSnap.PriceTick*m_mapRate[tagName.Kind]+0.5;							///< 行权价格(精确到厘) //[*放大倍数] 
 
 			QuoCollector::GetCollector()->OnImage( 1003, (char*)&tagName, sizeof(tagName), bIsLast );
 			QuoCollector::GetCollector()->OnImage( 1004, (char*)&tagSnapLF, sizeof(tagSnapLF), bIsLast );

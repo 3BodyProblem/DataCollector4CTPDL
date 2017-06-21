@@ -15,6 +15,7 @@
 #include "../Infrastructure/DateTime.h"
 
 
+typedef std::map<unsigned int,unsigned int>					T_MAP_RATE;			///< 放大倍数映射表[商品分类,商品放大倍数]
 typedef std::map<std::string,CThostFtdcInstrumentField>		T_MAP_BASEDATA;		///< 基础数据缓存
 
 
@@ -57,6 +58,11 @@ public:
 	 */
 	operator T_MAP_BASEDATA&();
 
+	/**
+	 * @brief				获取放大倍数
+	 */
+	static int				GetRate( unsigned int nKind );
+
 protected:///< 自有方法函数
 	/**
 	 * @brief				发送登录请求包
@@ -95,6 +101,7 @@ protected:
 	bool					m_bIsResponded;				///< 返回完成
 	unsigned short			m_nTrdReqID;				///< 交易api请求ID
 	CThostFtdcTraderApi*	m_pTraderApi;				///< 交易模块接口
+	static T_MAP_RATE		m_mapRate;					///< 各分类的放大倍数
 	T_MAP_BASEDATA			m_mapBasicData;				///< 市场商品基础数据集合
 	CriticalObject			m_oLock;					///< 临界区对象
 };
