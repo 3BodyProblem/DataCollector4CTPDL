@@ -296,11 +296,11 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 {
 	double							dRate = 1.;				///< 放大倍数
 	int								nSerial = 0;			///< 商品在码表的索引值
-	tagDLReferenceData_LF1003		tagName = { 0 };		///< 商品基础信息结构
-	tagDLSnapData_HF1005			tagSnapHF = { 0 };		///< 高速行情快照
-	tagDLSnapData_LF1004			tagSnapLF = { 0 };		///< 低速行情快照
-	tagDLSnapBuySell_HF1006			tagSnapBS = { 0 };		///< 档位信息
-	tagDLMarketStatus_HF1007		tagStatus = { 0 };		///< 市场状态信息
+	tagDLFutureReferenceData_LF103	tagName = { 0 };		///< 商品基础信息结构
+	tagDLFutureSnapData_HF105		tagSnapHF = { 0 };		///< 高速行情快照
+	tagDLFutureSnapData_LF104		tagSnapLF = { 0 };		///< 低速行情快照
+	tagDLFutureSnapBuySell_HF106	tagSnapBS = { 0 };		///< 档位信息
+	tagDLFutureMarketStatus_HF102	tagStatus = { 0 };		///< 市场状态信息
 	unsigned int					nSnapTradingDate = 0;	///< 快照交易日期
 
 	::strncpy( tagName.Code, pQuotationData->InstrumentID, sizeof(tagName.Code) );
@@ -377,12 +377,12 @@ void CTPQuotation::FlushQuotation( CThostFtdcDepthMarketDataField* pQuotationDat
 		tagStatus.MarketStatus = 1;
 		tagStatus.MarketDate = nSnapTradingDate;
 		tagStatus.MarketTime = nSnapUpdateTime;
-		QuoCollector::GetCollector()->OnData( 1007, (char*)&tagStatus, sizeof(tagStatus), false );
+		QuoCollector::GetCollector()->OnData( 102, (char*)&tagStatus, sizeof(tagStatus), false );
 	}
 
-	QuoCollector::GetCollector()->OnData( 1004, (char*)&tagSnapLF, sizeof(tagSnapLF), false );
-	QuoCollector::GetCollector()->OnData( 1005, (char*)&tagSnapHF, sizeof(tagSnapHF), false );
-	QuoCollector::GetCollector()->OnData( 1006, (char*)&tagSnapBS, sizeof(tagSnapBS), false );
+	QuoCollector::GetCollector()->OnData( 104, (char*)&tagSnapLF, sizeof(tagSnapLF), false );
+	QuoCollector::GetCollector()->OnData( 105, (char*)&tagSnapHF, sizeof(tagSnapHF), false );
+	QuoCollector::GetCollector()->OnData( 106, (char*)&tagSnapBS, sizeof(tagSnapBS), false );
 }
 
 void CTPQuotation::OnRspError( CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast )
