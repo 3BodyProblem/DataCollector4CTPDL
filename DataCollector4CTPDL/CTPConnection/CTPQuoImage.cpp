@@ -145,7 +145,7 @@ void CTPQuoImage::BuildBasicData()
 		tagKind.PriceRate = 2;
 		tagKind.LotFactor = 100;
 		m_mapRate[m_mapRate.size()] = tagKind.PriceRate;
-		QuoCollector::GetCollector()->OnImage( 1001, (char*)&tagKind, sizeof(tagKind), true );
+		QuoCollector::GetCollector()->OnImage( 101, (char*)&tagKind, sizeof(tagKind), true );
 	}
 
 	::strcpy( tagStatus.Key, "mkstatus" );
