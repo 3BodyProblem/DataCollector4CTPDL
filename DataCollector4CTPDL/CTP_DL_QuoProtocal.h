@@ -7,6 +7,7 @@ typedef struct
 {
 	char						Key[20];					///< 索引键值
 	unsigned int				MarketID;					///< 市场编号
+	unsigned int				MarketDate;					///< 市场日期
 	unsigned int				KindCount;					///< 类别数量
 	unsigned int				WareCount;					///< 商品数量
 	unsigned int				PeriodsCount;				///< 交易时段信息列表长度
@@ -27,7 +28,6 @@ typedef struct
 typedef struct
 {
 	char						Key[20];					///< 索引键值
-	unsigned int				MarketDate;					///< 市场日期
 	unsigned int				MarketTime;					///< 市场时间
 	unsigned char				MarketStatus;				///< 市场状态[0初始化 1行情中]
 } tagDLFutureMarketStatus_HF102;
@@ -48,8 +48,6 @@ typedef struct
 	unsigned int				XqDate;						///< 行权日(YYYYMM)
 	unsigned int				DeliveryDate;				///< 交割日(YYYYMMDD)
 	unsigned int				ExpireDate;					///< 到期日(YYYYMMDD)
-	unsigned short				TypePeriodIdx;				///< 分类交易时间段位置
-	unsigned char				EarlyNightFlag;             ///< 日盘or夜盘标志 1：日盘 2：夜盘 
 	unsigned int				PriceTick;					///< 最小变动价位
 } tagDLFutureReferenceData_LF103;
 
@@ -98,8 +96,6 @@ typedef struct
 
 #pragma pack()
 #endif
-
-
 
 
 
