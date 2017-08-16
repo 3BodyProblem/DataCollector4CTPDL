@@ -151,6 +151,8 @@ void MemoDumper<TYPE>::Close()
 template<class TYPE>
 bool MemoDumper<TYPE>::Open( bool bIsRead, const char* pszFileFolder, unsigned int nTradingDay )
 {
+	if( m_fInput.is_open() )	m_fInput.close();
+	if( m_fOutput.is_open() )	m_fOutput.close();
 	m_bIsRead = bIsRead;
 	::memset( m_pszTargetFile, 0, sizeof(m_pszTargetFile) );
 	::printf( "MemoDumper::Open() : File Path = %s, read flag = %d, trading day = %u\n", pszFileFolder, bIsRead, nTradingDay );

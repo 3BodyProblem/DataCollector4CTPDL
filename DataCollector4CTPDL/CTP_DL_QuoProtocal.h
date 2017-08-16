@@ -45,7 +45,6 @@ typedef struct
 	unsigned int				XqPrice;					///< 行权价格[*放大倍数]
 	unsigned int				StartDate;					///< 首个交易日(YYYYMMDD)
 	unsigned int				EndDate;					///< 最后交易日(YYYYMMDD)
-	unsigned int				XqDate;						///< 行权日(YYYYMM)
 	unsigned int				DeliveryDate;				///< 交割日(YYYYMMDD)
 	unsigned int				ExpireDate;					///< 到期日(YYYYMMDD)
 	unsigned int				PriceTick;					///< 最小变动价位
