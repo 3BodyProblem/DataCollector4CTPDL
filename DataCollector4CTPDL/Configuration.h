@@ -112,15 +112,16 @@ public:
 
 private:
 	bool						m_bBroadcastModel;		///< 数据自动播放模式
+	std::string					m_sBcTradeFile;			///< 播放的请求文件路径
+	std::string					m_sBcQuotationFile;		///< 播放的实时文件路径
+	unsigned int				m_nBcBeginTime;			///< 正常速度的播放时间
+
+private:
 	unsigned int				m_nMarketID;			///< 市场编号
 	std::string					m_sExchangeID;			///< 交易所编号
 	std::string					m_sDumpFileFolder;		///< 快照落盘路径(需要有文件名)
 	CTPLinkConfig				m_oHQConfigList;		///< CTP行情服务器连接配置列表
 	CTPLinkConfig				m_oTrdConfigList;		///< CTP交易服务器连接配置列表
-private:
-	std::string					m_sBcTradeFile;			///< 播放的请求文件路径
-	std::string					m_sBcQuotationFile;		///< 播放的实时文件路径
-	unsigned int				m_nBcBeginTime;			///< 正常速度的播放时间
 };
 
 
