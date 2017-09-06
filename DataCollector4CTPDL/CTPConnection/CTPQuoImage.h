@@ -3,6 +3,7 @@
 
 
 #pragma warning(disable:4786)
+#include <set>
 #include <map>
 #include <string>
 #include <fstream>
@@ -10,6 +11,7 @@
 #include "DataDump.h"
 #include "../Configuration.h"
 #include "ThostFtdcTraderApi.h"
+#include "../CTP_DL_QuoProtocal.h"
 #include "../Infrastructure/Lock.h"
 #include "../Infrastructure/Thread.h"
 #include "../Infrastructure/DateTime.h"
@@ -17,6 +19,7 @@
 
 typedef std::map<unsigned int,unsigned int>					T_MAP_RATE;			///< 放大倍数映射表[商品分类,商品放大倍数]
 typedef std::map<std::string,CThostFtdcInstrumentField>		T_MAP_BASEDATA;		///< 基础数据缓存
+typedef std::map<std::string,tagDLFutureKindDetail_LF101>	T_MAP_KIND;			///< 根据标的代码映射到对应的分类信息
 
 
 /**
@@ -100,6 +103,7 @@ protected:
 	unsigned short			m_nTrdReqID;				///< 交易api请求ID
 	CThostFtdcTraderApi*	m_pTraderApi;				///< 交易模块接口
 	static T_MAP_RATE		m_mapRate;					///< 各分类的放大倍数
+	static T_MAP_KIND		m_mapKind;					///< 分类信息集合
 	T_MAP_BASEDATA			m_mapBasicData;				///< 市场商品基础数据集合
 	CriticalObject			m_oLock;					///< 临界区对象
 protected:

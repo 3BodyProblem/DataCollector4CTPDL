@@ -23,7 +23,7 @@ typedef struct
 	unsigned int				PriceTick;					///< 最小变动价位
 	unsigned int				ContractMult;				///< 合约乘数
 	char						UnderlyingCode[20];			///< 标的证券代码
-	unsigned char				DerivativeType;				///< 衍生品类型：欧式美式+认购认沽
+	unsigned char				DerivativeType;				///< 衍生品类型：美式认购0/认沽1 欧式认购2/认沽3
 	unsigned int				PeriodsCount;				///< 交易时段信息列表长度
 	unsigned int				MarketPeriods[10][2];		///< 交易时段描述信息列表
 } tagDLFutureKindDetail_LF101;
