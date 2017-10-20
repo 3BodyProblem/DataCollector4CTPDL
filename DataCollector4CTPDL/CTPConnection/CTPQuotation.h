@@ -14,6 +14,78 @@
 #include "../Infrastructure/Thread.h"
 
 
+
+
+/**
+ * @class							PackagesLoopBuffer
+ * @brief							数据包队列缓存
+ * @detail							struct PkgHead + MessageID1 + data block1 + data block2 + struct PkgHead + MessageID2 + data block1 + data block2 + ...
+ * @author							barry
+ */
+class PackagesLoopBuffer
+{
+public:
+	PackagesLoopBuffer();
+	~PackagesLoopBuffer();
+
+public:
+	/**
+	 * @brief						初始化缓存对象
+	 * @param[in]					nMaxBufSize				将分配的缓存大小
+	 * @return						==0						成功
+	 */
+	int								Initialize( unsigned long nMaxBufSize );
+
+	/**
+	 * @brief						释放缓存空间
+	 */
+	void							Release();
+
+public:
+	/**
+	 * @brief						存储数据
+	 * @param[in]					nDataID					数据ID
+	 * @param[in]					pData					数据指针
+	 * @param[in]					nDataSize				数据长度
+	 * @param[in]					nSeqNo					当前数据块的更新序号
+	 * @return						==0						成功
+	 * @note						当nDataID不等于前一个包的nDataID时，将新启用一个Package封装
+	 */
+	int								PushBlock( unsigned int nDataID, const char* pData, unsigned int nDataSize, unsigned __int64 nSeqNo, unsigned int& nMsgCount, unsigned int& nBodySize );
+
+	/**
+	 * @brief						获取一个数据包
+	 * @param[out]					pBuff					输出数据缓存地址
+	 * @param[in]					nBuffSize				数据缓存长度
+	 * @param[out]					nMsgID					数据消息ID
+	 * @return						>0						数据长度
+									==0						无数据
+									<0						出错
+	 */
+	int								GetOnePkg( char* pBuff, unsigned int nBuffSize, unsigned int& nMsgID );
+
+	/**
+	 * @brief						是否为空
+	 * @return						true					为空
+	 */
+	bool							IsEmpty();
+
+	/**
+	 * @brief						获取余下空间的百分比
+	 */
+	float							GetPercentOfFreeSize();
+
+protected:
+	CriticalObject					m_oLock;				///< 锁
+	char*							m_pPkgBuffer;			///< 数据包缓存地址
+	unsigned int					m_nMaxPkgBufSize;		///< 数据包缓存大小
+	unsigned int					m_nCurrentPkgHeadPos;	///< 当前起始位置(当前所写入包的包头)
+	unsigned int					m_nFirstPkgHeadPos;		///< 起始位置索引(在写，或已经写完包的包头，即未发送数据的头部)
+	unsigned int					m_nCurrentWritePos;		///< 结束位置索引(正在写入的位置)
+};
+
+
+
 /**
  * @class			CTPWorkStatus
  * @brief			CTP工作状态管理
