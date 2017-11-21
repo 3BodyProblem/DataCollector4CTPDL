@@ -2,7 +2,7 @@
 #define	__DATA_TABLE_PAINTER_H__
 
 
-#include "Interface.h"
+#include "../../DataNode/DataNode/Interface.h"
 #include "Configuration.h"
 #include "Infrastructure/Lock.h"
 #include "CTPConnection/CTPQuoImage.h"

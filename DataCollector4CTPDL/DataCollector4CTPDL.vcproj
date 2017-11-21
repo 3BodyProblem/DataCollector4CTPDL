@@ -322,7 +322,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\Interface.h"
+			RelativePath="..\..\DataNode\DataNode\Interface.h"
 			>
 		</File>
 		<File
